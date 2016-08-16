@@ -1,0 +1,120 @@
+apply plugin: 'maven'
+apply plugin: 'osgi'
+apply plugin: 'signing'
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+
+version = '1.0.0-SNAPSHOT'
+group = 'de.undercouch'
+sourceCompatibility = '1.6'
+targetCompatibility = '1.6'
+
+repositories {
+    jcenter()
+}
+
+tasks.withType(JavaCompile) { 
+    options.compilerArgs << "-Xlint" 
+} 
+
+dependencies {
+    testCompile 'junit:junit:4.11'
+}
+
+jar {
+    // define OSGi bundle manifest
+    manifest {
+        name = 'actson'
+        symbolicName = "de.undercouch.actson"
+        vendor = 'Michel Kraemer'
+        instruction 'Import-Package', '*'
+        instruction 'Export-Package', "de.undercouch.*;version=${version}"
+    }
+    
+    // include license into jar
+    from 'LICENSE'
+}
+
+// initialize gradle wrapper
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.14.1'
+}
+
+// package javadoc into a jar file
+task packageJavadoc(type: Jar, dependsOn: 'javadoc') {
+    from javadoc.destinationDir
+    classifier = 'javadoc'
+}
+
+// package source into a jar file
+task packageSources(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+
+// define artifacts for upload
+artifacts {
+    archives jar
+    archives packageJavadoc
+    archives packageSources
+}
+
+// sign all artifacts
+signing {
+    required { gradle.taskGraph.hasTask(uploadArchives) }
+    sign configurations.archives
+}
+
+// remove test dependencies from configuration-to-scope mapping
+// this also removes them from the maven pom file
+conf2ScopeMappings.mappings.remove(configurations.testCompile)
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            // sign artifacts before upload
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+            
+            // upload to sonatype OSS
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
+                authentication(userName: this.hasProperty('sonatypeUsername') ? sonatypeUsername : '',
+                    password: this.hasProperty('sonatypePassword') ? sonatypePassword : '')
+            }
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
+                authentication(userName: this.hasProperty('sonatypeUsername') ? sonatypeUsername : '',
+                    password: this.hasProperty('sonatypePassword') ? sonatypePassword : '')
+            }
+            
+            // pom file details
+            pom.project {
+               name 'actson'
+               packaging 'jar'
+               description 'A reactive (non-blocking, asynchronous) JSON parser.'
+               url 'http://www.michel-kraemer.com'
+ 
+               scm {
+                   url 'scm:git:git://github.com/michel-kraemer/actson.git'
+                   connection 'scm:git:git://github.com/michel-kraemer/actson.git'
+                   developerConnection 'scm:git:git://github.com/michel-kraemer/actson.git'
+               }
+ 
+               licenses {
+                   license {
+                       name 'The Apache Software License, Version 2.0'
+                       url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                       distribution 'repo'
+                   }
+               }
+ 
+               developers {
+                   developer {
+                       id 'michel-kraemer'
+                       name 'Michel Kraemer'
+                       email 'michel@undercouch.de'
+                   }
+               }
+           }
+        }
+    }
+}

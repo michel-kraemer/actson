@@ -1,0 +1,16 @@
+.gradle/
+build/
+out/
+target/
+reports/
+gradle.properties
+
+bin/
+.externalToolBuilders/
+.settings/
+.classpath
+.project
+
+*.iml
+*.ipr
+*.iws
