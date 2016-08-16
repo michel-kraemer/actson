@@ -24,7 +24,9 @@
 
 package de.undercouch.actson;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * A non-blocking, event-based JSON parser
@@ -201,6 +203,17 @@ public class JsonParser {
   private int state;
   
   /**
+   * Collects all characters if the current state is ST (String),
+   * IN (Integer), FR (Fraction) or the like
+   */
+  private StringBuilder currentValue;
+
+  /**
+   * A set of listeners to notify
+   */
+  private List<JsonEventListener> listeners = new ArrayList<>();
+
+  /**
    * Push a mode onto the stack
    * @param mode the mode to push
    * @return false if there is overflow
@@ -274,6 +287,20 @@ public class JsonParser {
     // Get the next state from the state transition table.
     int nextState = state_transition_table[state][nextClass];
     if (nextState >= 0) {
+      if (nextState >= ST && nextState <= E3) {
+        if (state < ST || state > E3) {
+          currentValue = new StringBuilder();
+          if (nextState != ST) {
+            currentValue.append(nextChar);
+          }
+        } else {
+          currentValue.append(nextChar);
+        }
+      } else if (nextState == OK) {
+        // end of token identified, call right listener method
+        handleValue();
+      }
+
       // Change the state.
       state = nextState;
     } else {
@@ -285,6 +312,7 @@ public class JsonParser {
             return false;
         }
         state = OK;
+        fireEndObject();
         break;
 
       // }
@@ -293,6 +321,7 @@ public class JsonParser {
             return false;
         }
         state = OK;
+        fireEndObject();
         break;
 
       // ]
@@ -300,7 +329,9 @@ public class JsonParser {
         if (!pop(MODE_ARRAY)) {
             return false;
         }
+        handleValue();
         state = OK;
+        fireEndArray();
         break;
 
       // {
@@ -309,6 +340,7 @@ public class JsonParser {
             return false;
         }
         state = OB;
+        fireStartObject();
         break;
 
       // [
@@ -317,6 +349,7 @@ public class JsonParser {
             return false;
         }
         state = AR;
+        fireStartArray();
         break;
 
       // "
@@ -324,10 +357,14 @@ public class JsonParser {
         switch (stack[top]) {
         case MODE_KEY:
           state = CO;
+          fireFieldName(currentValue.toString());
+          currentValue = null;
           break;
         case MODE_ARRAY:
         case MODE_OBJECT:
           state = OK;
+          fireValue(currentValue.toString());
+          currentValue = null;
           break;
         default:
           return false;
@@ -342,9 +379,11 @@ public class JsonParser {
           if (!pop(MODE_OBJECT) || !push(MODE_KEY)) {
               return false;
           }
+          handleValue();
           state = KE;
           break;
         case MODE_ARRAY:
+          handleValue();
           state = VA;
           break;
         default:
@@ -368,6 +407,23 @@ public class JsonParser {
     }
     return true;
   }
+  
+  /**
+   * Call right listener method for the current value
+   */
+  private void handleValue() {
+    if (state == IN || state == ZE) {
+      fireValue(Integer.parseInt(currentValue.toString()));
+    } else if (state == FR || state == E1 || state == E2 || state == E3) {
+      fireValue(Double.parseDouble(currentValue.toString()));
+    } else if (state == T3) {
+      fireValue(true);
+    } else if (state == F4) {
+      fireValue(false);
+    } else if (state == N3) {
+      fireValueNull();
+    }
+  }
 
   /**
    * This method should be called after all of the characters have been
@@ -377,5 +433,117 @@ public class JsonParser {
    */
   public boolean done() {
     return state == OK && pop(MODE_DONE);
+  }
+  
+  /**
+   * Adds a listener that will be notified on every JSON token
+   * @param listener the listener to add
+   */
+  public void addListener(JsonEventListener listener) {
+    listeners.add(listener);
+  }
+
+  /**
+   * Removes a listener
+   * @param listener the listener to remove
+   */
+  public void removeListener(JsonEventListener listener) {
+    listeners.remove(listener);
+  }
+
+  /**
+   * Call the {@link JsonEventListener#onStartObject()} method of all listeners
+   */
+  private void fireStartObject() {
+    for (JsonEventListener l : listeners) {
+      l.onStartObject();
+    }
+  }
+
+  /**
+   * Call the {@link JsonEventListener#onEndObject()} method of all listeners
+   */
+  private void fireEndObject() {
+    for (JsonEventListener l : listeners) {
+      l.onEndObject();
+    }
+  }
+
+  /**
+   * Call the {@link JsonEventListener#onStartArray()} method of all listeners
+   */
+  private void fireStartArray() {
+    for (JsonEventListener l : listeners) {
+      l.onStartArray();
+    }
+  }
+
+  /**
+   * Call the {@link JsonEventListener#onEndArray()} method of all listeners
+   */
+  private void fireEndArray() {
+    for (JsonEventListener l : listeners) {
+      l.onEndArray();
+    }
+  }
+  
+  /**
+   * Call the {@link JsonEventListener#onFieldName(String)} method of all
+   * listeners
+   * @param fieldName the field name to forward
+   */
+  private void fireFieldName(String fieldName) {
+    for (JsonEventListener l : listeners) {
+      l.onFieldName(fieldName);
+    }
+  }
+
+  /**
+   * Call the {@link JsonEventListener#onValue(String)} method of all listeners
+   * @param value the value to forward
+   */
+  private void fireValue(String value) {
+    for (JsonEventListener l : listeners) {
+      l.onValue(value);
+    }
+  }
+
+  /**
+   * Call the {@link JsonEventListener#onValue(int)} method of all listeners
+   * @param value the value to forward
+   */
+  private void fireValue(int value) {
+    for (JsonEventListener l : listeners) {
+      l.onValue(value);
+    }
+  }
+
+  /**
+   * Call the {@link JsonEventListener#onValue(double)} method of all listeners
+   * @param value the value to forward
+   */
+  private void fireValue(double value) {
+    for (JsonEventListener l : listeners) {
+      l.onValue(value);
+    }
+  }
+
+  /**
+   * Call the {@link JsonEventListener#onValue(boolean)} method of all listeners
+   * @param value the value to forward
+   */
+  private void fireValue(boolean value) {
+    for (JsonEventListener l : listeners) {
+      l.onValue(value);
+    }
+  }
+  
+  /**
+   * Call the {@link JsonEventListener#onValueNull()} method of all listeners
+   */
+  private void fireValueNull() {
+    for (JsonEventListener l : listeners) {
+      l.onValueNull();
+    }
   }
 }
