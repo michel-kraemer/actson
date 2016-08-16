@@ -4,6 +4,14 @@ Actson is a reactive JSON parser (sometimes referred to as non-blocking JSON
 parser or asynchronous JSON parser). It is event-based and can be used together
 with reactive libraries such as [RxJava](https://github.com/ReactiveX/RxJava).
 
+## Similar libraries
+
+* [Jackson](https://github.com/FasterXML/jackson) has a streaming API that
+  produces JSON tokens/events. However, it uses blocking I/O because it reads
+  from an `InputStream`.
+* [Aalto XML](https://github.com/FasterXML/aalto-xml) is similar to Actson
+  but parses XML instead of JSON.
+
 ## Acknowledgments
 
 The event-based parser code and the JSON files used for testing are largely
