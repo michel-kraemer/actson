@@ -24,6 +24,8 @@
 
 package de.undercouch.actson;
 
+import java.util.Arrays;
+
 /**
  * This class is based on the file
  * <a href="http://www.json.org/JSON_checker/">JSON_checker.c</a>
@@ -191,6 +193,11 @@ public class JsonChecker {
   private int top = -1;
   
   /**
+   * The maximum number of modes on the stack
+   */
+  private final int depth;
+  
+  /**
    * The current state
    */
   private int state;
@@ -203,7 +210,10 @@ public class JsonChecker {
   private boolean push(int mode) {
     ++top;
     if (top >= stack.length) {
+      if (top >= depth) {
         return false;
+      }
+      stack = Arrays.copyOf(stack, Math.min(stack.length * 2, depth));
     }
     stack[top] = mode;
     return true;
@@ -226,16 +236,17 @@ public class JsonChecker {
    * Constructs the JsonChecker
    */
   public JsonChecker() {
-    this(16);
+    this(2048);
   }
 
   /**
    * Constructs the JsonChecker
-   * @param depth the maximum number of nested states
+   * @param depth the maximum number of modes on the stack
    */
   public JsonChecker(int depth) {
-    stack = new int[depth];
+    stack = new int[16];
     top = -1;
+    this.depth = depth;
     state = GO;
     push(MODE_DONE);
   }

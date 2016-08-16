@@ -46,7 +46,7 @@ public class JsonCheckerTest {
     for (int i = 1; i <= 3; ++i) {
       URL u = getClass().getResource("pass" + i + ".txt");
       String json = IOUtils.toString(u, "UTF-8");
-      JsonChecker checker = new JsonChecker(20);
+      JsonChecker checker = new JsonChecker();
       for (int j = 0; j < json.length(); ++j) {
         assertTrue(checker.feed(json.charAt(j)));
       }
@@ -63,7 +63,13 @@ public class JsonCheckerTest {
     for (int i = 1; i <= 33; ++i) {
       URL u = getClass().getResource("fail" + i + ".txt");
       String json = IOUtils.toString(u, "UTF-8");
-      JsonChecker checker = new JsonChecker(20);
+      JsonChecker checker;
+      if (i == 18) {
+        // test for too many nested modes
+        checker = new JsonChecker(16);
+      } else {
+        checker = new JsonChecker();
+      }
       boolean ok = true;
       for (int j = 0; j < json.length(); ++j) {
         ok &= checker.feed(json.charAt(j));
