@@ -2,7 +2,39 @@
 
 Actson is a reactive JSON parser (sometimes referred to as non-blocking or
 asynchronous). It is event-based and can be used together with reactive
-libraries such as [RxJava](https://github.com/ReactiveX/RxJava).
+libraries/tool-kits such as [RxJava](https://github.com/ReactiveX/RxJava) or
+[Vert.x](http://vertx.io).
+
+The library is very small and has no dependencies. It only requires Java 7
+(or higher).
+
+## Usage
+
+Consider a callback function `dataHandler` that asynchronously receives char
+arrays containing incomplete parts of a JSON text to parse. Consider another
+callback function `endHandler` that will be called when there is no more data
+to parse. Actson's `JsonParser` can be used as follows (pseudo code):
+
+```java
+JsonParser parser = new JsonParser();
+
+// Add your listener here. The listener will receive events from the
+// parser when it encouters JSON tokens.
+parser.addListener(new MyListener());
+
+public void dataHandler(char[] c) {
+    // Forward all characters to the parser. The parser will immediately
+    // call the listener on each JSON token.
+    for (int i = 0; i < c.length; ++i) {
+        parser.feed(c[i]); // returns false if the JSON text is invalid
+    }
+}
+
+public void endHandler() {
+    // don't forget to call done()
+    parser.done(); // returns false if the JSON text was invalid
+}
+```
 
 ## Examples
 
