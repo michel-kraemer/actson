@@ -27,13 +27,11 @@ package de.undercouch.actson;
 import java.util.Arrays;
 
 /**
- * This class is based on the file
- * <a href="http://www.json.org/JSON_checker/">JSON_checker.c</a>
- * from <a href="http://www.json.org/">JSON.org</a>
+ * A non-blocking, event-based JSON parser
  * @author Michel Kraemer
  * @author JSON.org
  */
-public class JsonChecker {
+public class JsonParser {
   private static final int __ = -1; // the universal error code
 
   /**
@@ -233,17 +231,17 @@ public class JsonChecker {
   }
   
   /**
-   * Constructs the JsonChecker
+   * Constructs the JSON parser
    */
-  public JsonChecker() {
+  public JsonParser() {
     this(2048);
   }
 
   /**
-   * Constructs the JsonChecker
+   * Constructs the JSON parser
    * @param depth the maximum number of modes on the stack
    */
-  public JsonChecker(int depth) {
+  public JsonParser(int depth) {
     stack = new int[16];
     top = -1;
     this.depth = depth;

@@ -33,10 +33,10 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 /**
- * Tests {@link JsonChecker}
+ * Tests {@link JsonParser}
  * @author Michel Kraemer
  */
-public class JsonCheckerTest {
+public class JsonParserTest {
   /**
    * Test if valid files can be parsed correctly
    * @throws IOException if one of the test files could not be read
@@ -46,11 +46,11 @@ public class JsonCheckerTest {
     for (int i = 1; i <= 3; ++i) {
       URL u = getClass().getResource("pass" + i + ".txt");
       String json = IOUtils.toString(u, "UTF-8");
-      JsonChecker checker = new JsonChecker();
+      JsonParser parser = new JsonParser();
       for (int j = 0; j < json.length(); ++j) {
-        assertTrue(checker.feed(json.charAt(j)));
+        assertTrue(parser.feed(json.charAt(j)));
       }
-      assertTrue(checker.done());
+      assertTrue(parser.done());
     }
   }
   
@@ -63,22 +63,22 @@ public class JsonCheckerTest {
     for (int i = 1; i <= 33; ++i) {
       URL u = getClass().getResource("fail" + i + ".txt");
       String json = IOUtils.toString(u, "UTF-8");
-      JsonChecker checker;
+      JsonParser parser;
       if (i == 18) {
         // test for too many nested modes
-        checker = new JsonChecker(16);
+        parser = new JsonParser(16);
       } else {
-        checker = new JsonChecker();
+        parser = new JsonParser();
       }
       boolean ok = true;
       for (int j = 0; j < json.length(); ++j) {
-        ok &= checker.feed(json.charAt(j));
+        ok &= parser.feed(json.charAt(j));
         if (!ok) {
           break;
         }
       }
       if (ok) {
-        ok &= checker.done();
+        ok &= parser.done();
       }
       assertFalse(ok);
     }
