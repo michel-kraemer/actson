@@ -4,6 +4,15 @@ Actson is a reactive JSON parser (sometimes referred to as non-blocking or
 asynchronous). It is event-based and can be used together with reactive
 libraries such as [RxJava](https://github.com/ReactiveX/RxJava).
 
+## Examples
+
+* [PrettyPrinter.java](src/test/java/de/undercouch/actson/examples/pretty/PrettyPrinter.java)
+  demonstrates how you can use
+  [JsonEventListener](src/main/java/de/undercouch/actson/JsonEventListener.java)
+  to pretty-print a JSON object or array. Note: this is no perfect
+  implementation of a pretty-printer. The output could still be nicer. But it
+  demonstrates very well how to use the event listener.
+
 ## Building
 
 Execute the following command to compile the library and to run the
