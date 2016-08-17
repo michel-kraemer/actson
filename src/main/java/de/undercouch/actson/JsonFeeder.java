@@ -24,62 +24,31 @@
 package de.undercouch.actson;
 
 /**
- * Listens to events from {@link JsonParser}
+ * A feeder is used by {@link JsonParser} to get more input to parse.
  * @author Michel Kraemer
  */
-public interface JsonEventListener {
+public interface JsonFeeder {
   /**
-   * Will be called when the start of a JSON object is encountered
+   * Provide more data to the {@link JsonParser}. Should only be called if
+   * {@link #isFull()} returns <code>false</code>.
+   * @param c the character to provide as input to the parser
+   * @throws IllegalStateException if the does not accept more input at the
+   * moment (see {@link #isFull()})
    */
-  void onStartObject();
+  void feed(char c);
   
   /**
-   * Will be called when the end of a JSON object is encountered
+   * Checks if the parser accepts more input at the moment. If it doesn't
+   * you have to call {@link JsonParser#nextEvent()} until it returns
+   * {@link JsonEvent#NEED_MORE_INPUT}. Only then new input can be provided
+   * to the parser.
+   * @return true if the parser does not accept more input
    */
-  void onEndObject();
+  boolean isFull();
   
   /**
-   * Will be called when the start of a JSON array is encountered
+   * Call this method to indicate that the end of the JSON text has been
+   * reached and that there is no more input to parse.
    */
-  void onStartArray();
-  
-  /**
-   * Will be called when the end of a JSON array is encountered
-   */
-  void onEndArray();
-  
-  /**
-   * Will be called when a field name is encountered
-   * @param name the field name
-   */
-  void onFieldName(String name);
-  
-  /**
-   * Will be called when a string value is encountered
-   * @param value the value
-   */
-  void onValue(String value);
-  
-  /**
-   * Will be called when an integer value is encountered
-   * @param value the value
-   */
-  void onValue(int value);
-  
-  /**
-   * Will be called when a double value is encountered
-   * @param value the value
-   */
-  void onValue(double value);
-  
-  /**
-   * Will be called when a boolean value is encountered
-   * @param value the value
-   */
-  void onValue(boolean value);
-  
-  /**
-   * Will be called when a null value is encountered
-   */
-  void onValueNull();
+  void done();
 }

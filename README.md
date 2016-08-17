@@ -10,30 +10,34 @@ The library is very small and has no dependencies. It only requires Java 7
 
 ## Usage
 
-Consider a callback function `dataHandler` that asynchronously receives char
-arrays containing incomplete parts of a JSON text to parse. Consider another
-callback function `endHandler` that will be called when there is no more data
-to parse. Actson's `JsonParser` can be used as follows (pseudo code):
+The following snippet demonstrates how you can use the parser sequentially.
 
 ```java
+// JSON text to parse
+String json = "{\"name\":\"Elvis\"}";
+
 JsonParser parser = new JsonParser();
 
-// Add your listener here. The listener will receive events from the
-// parser when it encouters JSON tokens.
-parser.addListener(new MyListener());
+int pos = 0; // position in the input JSON text
+int event; // event returned by the parser
+do {
+    // proceed until the parser returns a new event or until it needs more input
+    while ((event = parser.nextEvent()) == JsonEvent.NEED_MORE_INPUT) {
+        // provide the parser with more input
+        while (!parser.getFeeder().isFull() && pos < json.length()) {
+            parser.getFeeder().feed(json.charAt(pos));
+            ++pos;
+        }
 
-public void dataHandler(char[] c) {
-    // Forward all characters to the parser. The parser will immediately
-    // call the listener on each JSON token.
-    for (int i = 0; i < c.length; ++i) {
-        parser.feed(c[i]); // returns false if the JSON text is invalid
+        // indicate end of input to the parser
+        if (pos == json.length()) {
+            parser.getFeeder().done();
+        }
     }
-}
 
-public void endHandler() {
-    // don't forget to call done()
-    parser.done(); // returns false if the JSON text was invalid
-}
+    // handle event
+    System.out.println("JSON event: " + event);
+} while (event != JsonEvent.EOF);
 ```
 
 ## Examples

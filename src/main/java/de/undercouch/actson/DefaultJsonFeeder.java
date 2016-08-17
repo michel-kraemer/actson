@@ -24,59 +24,57 @@
 package de.undercouch.actson;
 
 /**
- * Adapter class providing empty implementations for all
- * {@link JsonEventListener} methods. Can be used as a base class
- * for implementations that are not interested in all JSON events.
+ * Default implementation of {@link JsonFeeder} used internally by
+ * the {@link JsonParser}.
  * @author Michel Kraemer
  */
-public class JsonEventListenerAdapter implements JsonEventListener {
+public class DefaultJsonFeeder implements JsonFeeder {
+  private boolean done = false;
+  private boolean full = false;
+  private char c;
+  
   @Override
-  public void onStartObject() {
-    // empty
+  public void feed(char c) {
+    if (full) {
+      throw new IllegalStateException("JSON parser is full");
+    }
+    this.c = c;
+    full = true;
   }
 
   @Override
-  public void onEndObject() {
-    // empty
+  public void done() {
+    done = true;
   }
-
+  
   @Override
-  public void onStartArray() {
-    // empty
+  public boolean isFull() {
+    return full;
   }
-
-  @Override
-  public void onEndArray() {
-    // empty
+  
+  /**
+   * @return true if the feeder has more input to be parsed
+   */
+  public boolean hasInput() {
+    return full;
   }
-
-  @Override
-  public void onFieldName(String name) {
-    // empty
+  
+  /**
+   * @return true of the end of input has been reached
+   */
+  public boolean isDone() {
+    return !hasInput() && done;
   }
-
-  @Override
-  public void onValue(String value) {
-    // empty
-  }
-
-  @Override
-  public void onValue(int value) {
-    // empty
-  }
-
-  @Override
-  public void onValue(double value) {
-    // empty
-  }
-
-  @Override
-  public void onValue(boolean value) {
-    // empty
-  }
-
-  @Override
-  public void onValueNull() {
-    // empty
+  
+  /**
+   * @return the next character to be parsed
+   * @throws IllegalStateException if there is no input to parse
+   */
+  public char nextInput() {
+    if (!full) {
+      throw new IllegalStateException("Not enough input data");
+    }
+    full = false;
+    return c;
   }
 }

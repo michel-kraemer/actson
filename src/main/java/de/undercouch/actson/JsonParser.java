@@ -24,9 +24,7 @@
 
 package de.undercouch.actson;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * A non-blocking, event-based JSON parser
@@ -207,11 +205,21 @@ public class JsonParser {
    * IN (Integer), FR (Fraction) or the like
    */
   private StringBuilder currentValue;
-
+  
   /**
-   * A set of listeners to notify
+   * The feeder is used to get input to parse
    */
-  private List<JsonEventListener> listeners = new ArrayList<>();
+  private DefaultJsonFeeder feeder = new DefaultJsonFeeder();
+  
+  /**
+   * The first event returned by {@link #parse(char)}
+   */
+  private int event1 = JsonEvent.NEED_MORE_INPUT;
+  
+  /**
+   * The second event returned by {@link #parse(char)}
+   */
+  private int event2 = JsonEvent.NEED_MORE_INPUT;
 
   /**
    * Push a mode onto the stack
@@ -261,26 +269,63 @@ public class JsonParser {
     state = GO;
     push(MODE_DONE);
   }
+  
+  /**
+   * Call this method to proceed parsing the JSON text and to get the next
+   * event. The method returns {@link JsonEvent#NEED_MORE_INPUT} if it needs
+   * more input data from the parser's feeder.
+   * @return the next JSON event or {@link JsonEvent#NEED_MORE_INPUT} if more
+   * input is needed
+   */
+  public int nextEvent() {
+    while (event1 == JsonEvent.NEED_MORE_INPUT) {
+      if (!feeder.hasInput()) {
+        if (feeder.isDone()) {
+          return (state == OK && pop(MODE_DONE) ? JsonEvent.EOF : JsonEvent.ERROR);
+        }
+        return JsonEvent.NEED_MORE_INPUT;
+      }
+      parse(feeder.nextInput());
+    }
+    
+    int r = event1;
+    if (event1 != JsonEvent.ERROR) {
+      event1 = event2;
+      event2 = JsonEvent.NEED_MORE_INPUT;
+    }
+    
+    return r;
+  }
+  
+  /**
+   * Get the feeder that can be used to provide more input to the parser
+   * @return the parser's feeder
+   */
+  public JsonFeeder getFeeder() {
+    return feeder;
+  }
 
   /**
-   * Call this function for each character (or partial character) in your JSON text.
-   * It can accept UTF-8, UTF-16, or UTF-32.
-   * @param nextChar the character to feed
-   * @return <code>true</code> if things are looking ok so far, <code>false</code>
-   * if it rejects the text.
+   * This function is called for each character (or partial character) in the
+   * JSON text. It can accept UTF-8, UTF-16, or UTF-32. It will set
+   * {@link #event1} and {@link #event2} accordingly. As a precondition these
+   * fields should have a value of {@link JsonEvent#NEED_MORE_INPUT}.
+   * @param nextChar the character to parse
    */
-  public boolean feed(char nextChar) {
+  private void parse(char nextChar) {
     // Determine the character's class.
     int nextClass;
     if (nextChar < 0) {
-        return false;
+        event1 = JsonEvent.ERROR;
+        return;
     }
     if (nextChar >= 128) {
         nextClass = C_ETC;
     } else {
         nextClass = ascii_class[nextChar];
         if (nextClass <= __) {
-            return false;
+            event1 = JsonEvent.ERROR;
+            return;
         }
     }
     
@@ -297,8 +342,8 @@ public class JsonParser {
           currentValue.append(nextChar);
         }
       } else if (nextState == OK) {
-        // end of token identified, call right listener method
-        handleValue();
+        // end of token identified, convert state to result
+        event1 = stateToEvent();
       }
 
       // Change the state.
@@ -309,47 +354,56 @@ public class JsonParser {
       // empty }
       case -9:
         if (!pop(MODE_KEY)) {
-            return false;
+          event1 = JsonEvent.ERROR;
+          return;
         }
         state = OK;
-        fireEndObject();
+        event1 = JsonEvent.END_OBJECT;
         break;
 
       // }
       case -8:
         if (!pop(MODE_OBJECT)) {
-            return false;
+          event1 = JsonEvent.ERROR;
+          return;
         }
         state = OK;
-        fireEndObject();
+        event1 = JsonEvent.END_OBJECT;
         break;
 
       // ]
       case -7:
         if (!pop(MODE_ARRAY)) {
-            return false;
+          event1 = JsonEvent.ERROR;
+          return;
         }
-        handleValue();
+        event1 = stateToEvent();
+        if (event1 == JsonEvent.NEED_MORE_INPUT) {
+          event1 = JsonEvent.END_ARRAY;
+        } else {
+          event2 = JsonEvent.END_ARRAY;
+        }
         state = OK;
-        fireEndArray();
         break;
 
       // {
       case -6:
         if (!push(MODE_KEY)) {
-            return false;
+          event1 = JsonEvent.ERROR;
+          return;
         }
         state = OB;
-        fireStartObject();
+        event1 = JsonEvent.START_OBJECT;
         break;
 
       // [
       case -5:
         if (!push(MODE_ARRAY)) {
-            return false;
+          event1 = JsonEvent.ERROR;
+          return;
         }
         state = AR;
-        fireStartArray();
+        event1 = JsonEvent.START_ARRAY;
         break;
 
       // "
@@ -357,17 +411,16 @@ public class JsonParser {
         switch (stack[top]) {
         case MODE_KEY:
           state = CO;
-          fireFieldName(currentValue.toString());
-          currentValue = null;
+          event1 = JsonEvent.FIELD_NAME;
           break;
         case MODE_ARRAY:
         case MODE_OBJECT:
           state = OK;
-          fireValue(currentValue.toString());
-          currentValue = null;
+          event1 = JsonEvent.VALUE_STRING;
           break;
         default:
-          return false;
+          event1 = JsonEvent.ERROR;
+          return;
         }
         break;
 
@@ -377,17 +430,19 @@ public class JsonParser {
         case MODE_OBJECT:
           // A comma causes a flip from object mode to key mode.
           if (!pop(MODE_OBJECT) || !push(MODE_KEY)) {
-              return false;
+            event1 = JsonEvent.ERROR;
+            return;
           }
-          handleValue();
+          event1 = stateToEvent();
           state = KE;
           break;
         case MODE_ARRAY:
-          handleValue();
+          event1 = stateToEvent();
           state = VA;
           break;
         default:
-          return false;
+          event1 = JsonEvent.ERROR;
+          return;
         }
         break;
 
@@ -395,155 +450,64 @@ public class JsonParser {
       case -2:
         // A colon causes a flip from key mode to object mode.
         if (!pop(MODE_KEY) || !push(MODE_OBJECT)) {
-          return false;
+          event1 = JsonEvent.ERROR;
+          return;
         }
         state = VA;
         break;
 
       // Bad action.
       default:
-        return false;
+        event1 = JsonEvent.ERROR;
+        return;
       }
     }
-    return true;
   }
   
   /**
-   * Call right listener method for the current value
+   * Converts the current parser state to a JSON event
+   * @return the JSON event or {@link JsonEvent#NEED_MORE_INPUT} if the
+   * current state does not produce a JSON event
    */
-  private void handleValue() {
+  private int stateToEvent() {
     if (state == IN || state == ZE) {
-      fireValue(Integer.parseInt(currentValue.toString()));
+      return JsonEvent.VALUE_INT;
     } else if (state == FR || state == E1 || state == E2 || state == E3) {
-      fireValue(Double.parseDouble(currentValue.toString()));
+      return JsonEvent.VALUE_DOUBLE;
     } else if (state == T3) {
-      fireValue(true);
+      return JsonEvent.VALUE_TRUE;
     } else if (state == F4) {
-      fireValue(false);
+      return JsonEvent.VALUE_FALSE;
     } else if (state == N3) {
-      fireValueNull();
+      return JsonEvent.VALUE_NULL;
     }
+    return JsonEvent.NEED_MORE_INPUT;
   }
 
   /**
-   * This method should be called after all of the characters have been
-   * processed, but only if every call to {@link #feed(char)} returned
-   * <code>true</code>.
-   * @return <code>true</code> if the JSON text was accepted.
+   * If the event returned by {@link #nextEvent()} was
+   * {@link JsonEvent#VALUE_STRING} this method will return the parsed string
+   * @return the parsed string
    */
-  public boolean done() {
-    return state == OK && pop(MODE_DONE);
+  public String getCurrentString() {
+    return currentValue.toString();
   }
   
   /**
-   * Adds a listener that will be notified on every JSON token
-   * @param listener the listener to add
+   * If the event returned by {@link #nextEvent()} was
+   * {@link JsonEvent#VALUE_INT} this method will return the parsed integer
+   * @return the parsed integer
    */
-  public void addListener(JsonEventListener listener) {
-    listeners.add(listener);
-  }
-
-  /**
-   * Removes a listener
-   * @param listener the listener to remove
-   */
-  public void removeListener(JsonEventListener listener) {
-    listeners.remove(listener);
-  }
-
-  /**
-   * Call the {@link JsonEventListener#onStartObject()} method of all listeners
-   */
-  private void fireStartObject() {
-    for (JsonEventListener l : listeners) {
-      l.onStartObject();
-    }
-  }
-
-  /**
-   * Call the {@link JsonEventListener#onEndObject()} method of all listeners
-   */
-  private void fireEndObject() {
-    for (JsonEventListener l : listeners) {
-      l.onEndObject();
-    }
-  }
-
-  /**
-   * Call the {@link JsonEventListener#onStartArray()} method of all listeners
-   */
-  private void fireStartArray() {
-    for (JsonEventListener l : listeners) {
-      l.onStartArray();
-    }
-  }
-
-  /**
-   * Call the {@link JsonEventListener#onEndArray()} method of all listeners
-   */
-  private void fireEndArray() {
-    for (JsonEventListener l : listeners) {
-      l.onEndArray();
-    }
+  public int getCurrentInt() {
+    return Integer.parseInt(currentValue.toString());
   }
   
   /**
-   * Call the {@link JsonEventListener#onFieldName(String)} method of all
-   * listeners
-   * @param fieldName the field name to forward
+   * If the event returned by {@link #nextEvent()} was
+   * {@link JsonEvent#VALUE_DOUBLE} this method will return the parsed double
+   * @return the parsed double
    */
-  private void fireFieldName(String fieldName) {
-    for (JsonEventListener l : listeners) {
-      l.onFieldName(fieldName);
-    }
-  }
-
-  /**
-   * Call the {@link JsonEventListener#onValue(String)} method of all listeners
-   * @param value the value to forward
-   */
-  private void fireValue(String value) {
-    for (JsonEventListener l : listeners) {
-      l.onValue(value);
-    }
-  }
-
-  /**
-   * Call the {@link JsonEventListener#onValue(int)} method of all listeners
-   * @param value the value to forward
-   */
-  private void fireValue(int value) {
-    for (JsonEventListener l : listeners) {
-      l.onValue(value);
-    }
-  }
-
-  /**
-   * Call the {@link JsonEventListener#onValue(double)} method of all listeners
-   * @param value the value to forward
-   */
-  private void fireValue(double value) {
-    for (JsonEventListener l : listeners) {
-      l.onValue(value);
-    }
-  }
-
-  /**
-   * Call the {@link JsonEventListener#onValue(boolean)} method of all listeners
-   * @param value the value to forward
-   */
-  private void fireValue(boolean value) {
-    for (JsonEventListener l : listeners) {
-      l.onValue(value);
-    }
-  }
-  
-  /**
-   * Call the {@link JsonEventListener#onValueNull()} method of all listeners
-   */
-  private void fireValueNull() {
-    for (JsonEventListener l : listeners) {
-      l.onValueNull();
-    }
+  public double getCurrentDouble() {
+    return Double.parseDouble(currentValue.toString());
   }
 }

@@ -26,17 +26,17 @@ package de.undercouch.actson.examples.pretty;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-import de.undercouch.actson.JsonEventListener;
+import de.undercouch.actson.JsonEvent;
 import de.undercouch.actson.JsonParser;
 
 /**
- * Demonstrates how you can use {@link JsonEventListener} to pretty-print
+ * Demonstrates how you can use the {@link JsonParser} to pretty-print
  * a JSON object or array. Note: this is no perfect implementation of a
- * pretty-printer. The output could still be nicer. But it demonstrates
- * very well how to use the event listener.
+ * pretty-printer. The output could still be nicer. It's just a sample
+ * application.
  * @author Michel Kraemer
  */
-public class PrettyPrinter implements JsonEventListener {
+public class PrettyPrinter {
   /**
    * Main method demonstrating how to use the pretty-printer
    * @param args program arguments
@@ -46,12 +46,21 @@ public class PrettyPrinter implements JsonEventListener {
     
     JsonParser parser = new JsonParser();
     PrettyPrinter prettyPrinter = new PrettyPrinter();
-    parser.addListener(prettyPrinter);
     
-    for (int i = 0; i < json.length(); ++i) {
-      parser.feed(json.charAt(i));
-    }
-    parser.done();
+    int i = 0;
+    int event;
+    do {
+      while ((event = parser.nextEvent()) == JsonEvent.NEED_MORE_INPUT) {
+        while (!parser.getFeeder().isFull() && i < json.length()) {
+          parser.getFeeder().feed(json.charAt(i));
+          ++i;
+        }
+        if (i == json.length()) {
+          parser.getFeeder().done();
+        }
+      }
+      prettyPrinter.onEvent(event, parser);
+    } while (event != JsonEvent.EOF);
     
     System.out.println(prettyPrinter.getResult());
     // expected output:
@@ -75,8 +84,7 @@ public class PrettyPrinter implements JsonEventListener {
     }
   }
 
-  @Override
-  public void onStartObject() {
+  private void onStartObject() {
     onValue();
     result.append("{\n");
     level++;
@@ -85,8 +93,7 @@ public class PrettyPrinter implements JsonEventListener {
     types.push(Type.OBJECT);
   }
 
-  @Override
-  public void onEndObject() {
+  private void onEndObject() {
     level--;
     result.append("\n");
     indent();
@@ -95,8 +102,7 @@ public class PrettyPrinter implements JsonEventListener {
     types.pop();
   }
 
-  @Override
-  public void onStartArray() {
+  private void onStartArray() {
     onValue();
     result.append("[\n");
     level++;
@@ -105,8 +111,7 @@ public class PrettyPrinter implements JsonEventListener {
     types.push(Type.ARRAY);
   }
 
-  @Override
-  public void onEndArray() {
+  private void onEndArray() {
     level--;
     result.append("\n");
     indent();
@@ -115,8 +120,7 @@ public class PrettyPrinter implements JsonEventListener {
     types.pop();
   }
 
-  @Override
-  public void onFieldName(String name) {
+  private void onFieldName(String name) {
     if (elementCounts.peek() > 0) {
       result.append(",\n");
       indent();
@@ -134,34 +138,76 @@ public class PrettyPrinter implements JsonEventListener {
     }
   }
 
-  @Override
-  public void onValue(String value) {
+  private void onValue(String value) {
     onValue();
     result.append("\"" + value + "\"");
   }
 
-  @Override
-  public void onValue(int value) {
+  private void onValue(int value) {
     onValue();
     result.append(value);
   }
 
-  @Override
-  public void onValue(double value) {
+  private void onValue(double value) {
     onValue();
     result.append(value);
   }
 
-  @Override
-  public void onValue(boolean value) {
+  private void onValue(boolean value) {
     onValue();
     result.append(value);
   }
 
-  @Override
-  public void onValueNull() {
+  private void onValueNull() {
     onValue();
     result.append("null");
+  }
+  
+  /**
+   * Call this method on every JSON event. It will generate pretty JSON text.
+   * @param event the JSON event returned by the parser
+   * @param parser the JSON parser
+   */
+  public void onEvent(int event, JsonParser parser) {
+    switch (event) {
+    case JsonEvent.START_OBJECT:
+      onStartObject();
+      break;
+    case JsonEvent.END_OBJECT:
+      onEndObject();
+      break;
+    case JsonEvent.START_ARRAY:
+      onStartArray();
+      break;
+    case JsonEvent.END_ARRAY:
+      onEndArray();
+      break;
+    case JsonEvent.FIELD_NAME:
+      onFieldName(parser.getCurrentString());
+      break;
+    case JsonEvent.VALUE_STRING:
+      onValue(parser.getCurrentString());
+      break;
+    case JsonEvent.VALUE_INT:
+      onValue(parser.getCurrentInt());
+      break;
+    case JsonEvent.VALUE_DOUBLE:
+      onValue(parser.getCurrentDouble());
+      break;
+    case JsonEvent.VALUE_TRUE:
+      onValue(true);
+      break;
+    case JsonEvent.VALUE_FALSE:
+      onValue(false);
+      break;
+    case JsonEvent.VALUE_NULL:
+      onValueNull();
+      break;
+    case JsonEvent.EOF:
+      break;
+    default:
+      throw new IllegalArgumentException("Unknown event: " + event);
+    }
   }
   
   /**

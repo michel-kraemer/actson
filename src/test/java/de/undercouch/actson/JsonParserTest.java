@@ -25,7 +25,6 @@ package de.undercouch.actson;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.URL;
@@ -53,14 +52,26 @@ public class JsonParserTest {
    * @return the new JSON string
    */
   private String parse(String json) {
+    PrettyPrinter printer = new PrettyPrinter();
     JsonParser parser = new JsonParser();
-    PrettyPrinter l = new PrettyPrinter();
-    parser.addListener(l);
-    for (int j = 0; j < json.length(); ++j) {
-      assertTrue(parser.feed(json.charAt(j)));
-    }
-    assertTrue(parser.done());
-    return l.getResult();
+    
+    int i = 0;
+    int event;
+    do {
+      while ((event = parser.nextEvent()) == JsonEvent.NEED_MORE_INPUT) {
+        while (!parser.getFeeder().isFull() && i < json.length()) {
+          parser.getFeeder().feed(json.charAt(i));
+          ++i;
+        }
+        if (i == json.length()) {
+          parser.getFeeder().done();
+        }
+      }
+      assertFalse("Invalid JSON text", event == JsonEvent.ERROR);
+      printer.onEvent(event, parser);
+    } while (event != JsonEvent.EOF);
+    
+    return printer.getResult();
   }
 
   /**
@@ -125,22 +136,30 @@ public class JsonParserTest {
       URL u = getClass().getResource("fail" + i + ".txt");
       String json = IOUtils.toString(u, "UTF-8");
       JsonParser parser;
+      
       if (i == 18) {
         // test for too many nested modes
         parser = new JsonParser(16);
       } else {
         parser = new JsonParser();
       }
+      
       boolean ok = true;
-      for (int j = 0; j < json.length(); ++j) {
-        ok &= parser.feed(json.charAt(j));
-        if (!ok) {
-          break;
+      int j = 0;
+      int event;
+      do {
+        while ((event = parser.nextEvent()) == JsonEvent.NEED_MORE_INPUT) {
+          while (!parser.getFeeder().isFull() && j < json.length()) {
+            parser.getFeeder().feed(json.charAt(j));
+            ++j;
+          }
+          if (j == json.length()) {
+            parser.getFeeder().done();
+          }
         }
-      }
-      if (ok) {
-        ok &= parser.done();
-      }
+        ok &= (event != JsonEvent.ERROR);
+      } while (ok && event != JsonEvent.EOF);
+      
       assertFalse(ok);
     }
   }
