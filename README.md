@@ -37,6 +37,9 @@ do {
 
     // handle event
     System.out.println("JSON event: " + event);
+    if (event == JsonEvent.ERROR) {
+        throw new IllegalStateException("Syntax error in JSON text");
+    }
 } while (event != JsonEvent.EOF);
 ```
 
