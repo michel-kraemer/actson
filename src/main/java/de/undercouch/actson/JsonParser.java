@@ -258,7 +258,7 @@ public class JsonParser {
    * Constructs a JSON parser that uses the UTF-8 charset to decode input data
    */
   public JsonParser() {
-    this(2048);
+    this(StandardCharsets.UTF_8);
   }
   
   /**

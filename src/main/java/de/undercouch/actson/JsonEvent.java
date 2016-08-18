@@ -28,11 +28,7 @@ package de.undercouch.actson;
  * {@link JsonParser#nextEvent()}
  * @author Michel Kraemer
  */
-public abstract class JsonEvent {
-  private JsonEvent() {
-    // hidden constructor
-  }
-  
+public interface JsonEvent {
   /**
    * The JSON text contains a syntax error.
    */

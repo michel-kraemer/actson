@@ -29,8 +29,10 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
 import java.nio.charset.MalformedInputException;
 import java.nio.charset.StandardCharsets;
+import java.nio.charset.UnmappableCharacterException;
 
 import org.junit.Test;
 
@@ -256,9 +258,25 @@ public class DefaultJsonFeederTest {
    * @throws CharacterCodingException if the test is successful
    */
   @Test(expected = MalformedInputException.class)
-  public void illegalCharacter() throws CharacterCodingException {
+  public void malformedInput() throws CharacterCodingException {
     feeder.feed((byte)0xff);
     feeder.feed((byte)0xff);
     feeder.nextInput();
+  }
+  
+  /**
+   * Tests if the feeder throws an exception if one of the output characters
+   * is unmappable
+   * @throws CharacterCodingException if the test is successful
+   */
+  @Test(expected = UnmappableCharacterException.class)
+  public void unmappableCharacter() throws CharacterCodingException {
+    DefaultJsonFeeder feeder = new DefaultJsonFeeder(
+        Charset.forName("IBM1098"));
+    feeder.feed((byte)0x80);
+    feeder.feed((byte)0x81);
+    while (feeder.hasInput()) {
+      System.out.println(feeder.nextInput());
+    }
   }
 }

@@ -29,6 +29,8 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
+import java.nio.charset.MalformedInputException;
+import java.nio.charset.UnmappableCharacterException;
 
 /**
  * Default implementation of {@link JsonFeeder} used internally by
@@ -108,8 +110,7 @@ public class DefaultJsonFeeder implements JsonFeeder {
     if (!hasInput()) {
       throw new IllegalStateException("Not enough input data");
     }
-    char c = charBuf.get();
-    return c;
+    return charBuf.get();
   }
   
   /**
@@ -132,8 +133,11 @@ public class DefaultJsonFeeder implements JsonFeeder {
     byteBuf.flip();
     
     CoderResult result = decoder.decode(byteBuf, charBuf, done);
-    if (result.isError()) {
-      result.throwException();
+    if (result.isMalformed()) {
+      throw new MalformedInputException(result.length());
+    }
+    if (result.isUnmappable()) {
+      throw new UnmappableCharacterException(result.length());
     }
     
     charBuf.flip();
