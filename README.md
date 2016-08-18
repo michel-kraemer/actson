@@ -14,9 +14,9 @@ The following snippet demonstrates how you can use the parser sequentially.
 
 ```java
 // JSON text to parse
-String json = "{\"name\":\"Elvis\"}";
+byte[] json = "{\"name\":\"Elvis\"}".getBytes(StandardCharsets.UTF_8);
 
-JsonParser parser = new JsonParser();
+JsonParser parser = new JsonParser(StandardCharsets.UTF_8);
 
 int pos = 0; // position in the input JSON text
 int event; // event returned by the parser
@@ -24,13 +24,13 @@ do {
     // proceed until the parser returns a new event or until it needs more input
     while ((event = parser.nextEvent()) == JsonEvent.NEED_MORE_INPUT) {
         // provide the parser with more input
-        while (!parser.getFeeder().isFull() && pos < json.length()) {
-            parser.getFeeder().feed(json.charAt(pos));
+        while (!parser.getFeeder().isFull() && pos < json.length) {
+            parser.getFeeder().feed(json[pos]);
             ++pos;
         }
 
         // indicate end of input to the parser
-        if (pos == json.length()) {
+        if (pos == json.length) {
             parser.getFeeder().done();
         }
     }

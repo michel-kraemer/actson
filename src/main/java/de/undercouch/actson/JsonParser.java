@@ -24,6 +24,9 @@
 
 package de.undercouch.actson;
 
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
@@ -209,7 +212,7 @@ public class JsonParser {
   /**
    * The feeder is used to get input to parse
    */
-  private DefaultJsonFeeder feeder = new DefaultJsonFeeder();
+  private final DefaultJsonFeeder feeder;
   
   /**
    * The first event returned by {@link #parse(char)}
@@ -252,22 +255,42 @@ public class JsonParser {
   }
   
   /**
-   * Constructs the JSON parser
+   * Constructs a JSON parser that uses the UTF-8 charset to decode input data
    */
   public JsonParser() {
     this(2048);
   }
-
+  
   /**
-   * Constructs the JSON parser
+   * Constructs a JSON parser
+   * @param charset the charset that should be used to decode the
+   * parser's input data
+   */
+  public JsonParser(Charset charset) {
+    this(charset, 2048);
+  }
+  
+  /**
+   * Constructs a JSON parser that uses the UTF-8 charset to decode input data
    * @param depth the maximum number of modes on the stack
    */
   public JsonParser(int depth) {
+    this(StandardCharsets.UTF_8, depth);
+  }
+
+  /**
+   * Constructs the JSON parser
+   * @param charset the charset that should be used to decode the
+   * parser's input data
+   * @param depth the maximum number of modes on the stack
+   */
+  public JsonParser(Charset charset, int depth) {
     stack = new int[16];
     top = -1;
     this.depth = depth;
     state = GO;
     push(MODE_DONE);
+    feeder = new DefaultJsonFeeder(charset);
   }
   
   /**
@@ -279,13 +302,17 @@ public class JsonParser {
    */
   public int nextEvent() {
     while (event1 == JsonEvent.NEED_MORE_INPUT) {
-      if (!feeder.hasInput()) {
-        if (feeder.isDone()) {
-          return (state == OK && pop(MODE_DONE) ? JsonEvent.EOF : JsonEvent.ERROR);
+      try {
+        if (!feeder.hasInput()) {
+          if (feeder.isDone()) {
+            return (state == OK && pop(MODE_DONE) ? JsonEvent.EOF : JsonEvent.ERROR);
+          }
+          return JsonEvent.NEED_MORE_INPUT;
         }
-        return JsonEvent.NEED_MORE_INPUT;
+        parse(feeder.nextInput());
+      } catch (CharacterCodingException e) {
+        return JsonEvent.ERROR;
       }
-      parse(feeder.nextInput());
     }
     
     int r = event1;

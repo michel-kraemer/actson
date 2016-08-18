@@ -23,6 +23,7 @@
 
 package de.undercouch.actson.examples.pretty;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
@@ -42,7 +43,7 @@ public class PrettyPrinter {
    * @param args program arguments
    */
   public static void main(String[] args) {
-    String json = "{\"name\":\"Elvis\"}";
+    byte[] json = "{\"name\":\"Elvis\"}".getBytes(StandardCharsets.UTF_8);
     
     JsonParser parser = new JsonParser();
     PrettyPrinter prettyPrinter = new PrettyPrinter();
@@ -51,11 +52,11 @@ public class PrettyPrinter {
     int event;
     do {
       while ((event = parser.nextEvent()) == JsonEvent.NEED_MORE_INPUT) {
-        while (!parser.getFeeder().isFull() && i < json.length()) {
-          parser.getFeeder().feed(json.charAt(i));
+        while (!parser.getFeeder().isFull() && i < json.length) {
+          parser.getFeeder().feed(json[i]);
           ++i;
         }
-        if (i == json.length()) {
+        if (i == json.length) {
           parser.getFeeder().done();
         }
       }

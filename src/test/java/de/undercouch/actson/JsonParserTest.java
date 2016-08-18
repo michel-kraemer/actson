@@ -28,6 +28,7 @@ import static org.junit.Assert.assertFalse;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -52,6 +53,8 @@ public class JsonParserTest {
    * @return the new JSON string
    */
   private String parse(String json) {
+    byte[] buf = json.getBytes(StandardCharsets.UTF_8);
+    
     PrettyPrinter printer = new PrettyPrinter();
     JsonParser parser = new JsonParser();
     
@@ -59,11 +62,11 @@ public class JsonParserTest {
     int event;
     do {
       while ((event = parser.nextEvent()) == JsonEvent.NEED_MORE_INPUT) {
-        while (!parser.getFeeder().isFull() && i < json.length()) {
-          parser.getFeeder().feed(json.charAt(i));
+        while (!parser.getFeeder().isFull() && i < buf.length) {
+          parser.getFeeder().feed(buf[i]);
           ++i;
         }
-        if (i == json.length()) {
+        if (i == buf.length) {
           parser.getFeeder().done();
         }
       }
@@ -134,7 +137,7 @@ public class JsonParserTest {
   public void testFail() throws IOException {
     for (int i = 1; i <= 33; ++i) {
       URL u = getClass().getResource("fail" + i + ".txt");
-      String json = IOUtils.toString(u, "UTF-8");
+      byte[] json = IOUtils.toByteArray(u);
       JsonParser parser;
       
       if (i == 18) {
@@ -149,11 +152,11 @@ public class JsonParserTest {
       int event;
       do {
         while ((event = parser.nextEvent()) == JsonEvent.NEED_MORE_INPUT) {
-          while (!parser.getFeeder().isFull() && j < json.length()) {
-            parser.getFeeder().feed(json.charAt(j));
+          while (!parser.getFeeder().isFull() && j < json.length) {
+            parser.getFeeder().feed(json[j]);
             ++j;
           }
-          if (j == json.length()) {
+          if (j == json.length) {
             parser.getFeeder().done();
           }
         }

@@ -31,14 +31,14 @@ public interface JsonFeeder {
   /**
    * Provide more data to the {@link JsonParser}. Should only be called if
    * {@link #isFull()} returns <code>false</code>.
-   * @param c the character to provide as input to the parser
-   * @throws IllegalStateException if the does not accept more input at the
-   * moment (see {@link #isFull()})
+   * @param b the byte to provide as input to the parser
+   * @throws IllegalStateException if the parser does not accept more input at
+   * the moment (see {@link #isFull()})
    */
-  void feed(char c);
+  void feed(byte b);
   
   /**
-   * Checks if the parser accepts more input at the moment. If it doesn't
+   * Checks if the parser accepts more input at the moment. If it doesn't,
    * you have to call {@link JsonParser#nextEvent()} until it returns
    * {@link JsonEvent#NEED_MORE_INPUT}. Only then new input can be provided
    * to the parser.
