@@ -1,4 +1,4 @@
-# Actson
+# Actson [![CircleCI](https://img.shields.io/circleci/project/michel-kraemer/actson.svg?maxAge=2592000)](https://circleci.com/gh/michel-kraemer/actson) [![codecov](https://codecov.io/gh/michel-kraemer/actson/branch/master/graph/badge.svg)](https://codecov.io/gh/michel-kraemer/actson) [![Apache License, Version 2.0](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 Actson is a reactive JSON parser (sometimes referred to as non-blocking or
 asynchronous). It is event-based and can be used together with reactive
