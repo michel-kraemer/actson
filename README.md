@@ -44,6 +44,10 @@ do {
 
 * [SimpleExample.java](examples/src/main/java/simple/SimpleExample.java)
   shows sequential usage of Actson (basically the same as the example above).
+* [VertxExample.java](examples/src/main/java/vertx/VertxExample.java)
+  demonstrates how Actson can be used together with Vert.x. It does the same as
+  [SimpleExample.java](examples/src/main/java/simple/SimpleExample.java)
+  but works completely asynchronously and non-blocking.
 * [PrettyPrinter.java](src/test/java/de/undercouch/actson/PrettyPrinter.java)
   demonstrates how you can use Actson to pretty-print a JSON object or array.
   Note: this is no perfect implementation of a pretty-printer. The output could
