@@ -196,7 +196,7 @@ public class JsonParser {
   /**
    * The maximum number of modes on the stack
    */
-  private final int depth;
+  private int depth = 2048;
   
   /**
    * The current state
@@ -212,7 +212,7 @@ public class JsonParser {
   /**
    * The feeder is used to get input to parse
    */
-  private final DefaultJsonFeeder feeder;
+  private final JsonFeeder feeder;
   
   /**
    * The first event returned by {@link #parse(char)}
@@ -267,30 +267,36 @@ public class JsonParser {
    * parser's input data
    */
   public JsonParser(Charset charset) {
-    this(charset, 2048);
+    this(new DefaultJsonFeeder(charset));
   }
   
   /**
-   * Constructs a JSON parser that uses the UTF-8 charset to decode input data
-   * @param depth the maximum number of modes on the stack
-   */
-  public JsonParser(int depth) {
-    this(StandardCharsets.UTF_8, depth);
-  }
-
-  /**
    * Constructs the JSON parser
-   * @param charset the charset that should be used to decode the
-   * parser's input data
-   * @param depth the maximum number of modes on the stack
+   * @param feeder the feeder that will provide the parser with input data
    */
-  public JsonParser(Charset charset, int depth) {
+  public JsonParser(JsonFeeder feeder) {
     stack = new int[16];
     top = -1;
-    this.depth = depth;
     state = GO;
     push(MODE_DONE);
-    feeder = new DefaultJsonFeeder(charset);
+    this.feeder = feeder;
+  }
+  
+  /**
+   * Set the maximum number of modes on the stack (basically the maximum number
+   * of nested objects/arrays in the JSON text to parse)
+   * @param depth the maximum number of modes
+   */
+  public void setMaxDepth(int depth) {
+    this.depth = depth;
+  }
+  
+  /**
+   * @return the maximum number of modes on the stack (basically the maximum
+   * number of nested objects/arrays in the JSON text to parse)
+   */
+  public int getMaxDepth() {
+    return depth;
   }
   
   /**

@@ -176,7 +176,9 @@ public class JsonParserTest {
       
       if (i == 18) {
         // test for too many nested modes
-        parser = new JsonParser(16);
+        parser = new JsonParser();
+        parser.setMaxDepth(16);
+        assertEquals(16, parser.getMaxDepth());
       } else {
         parser = new JsonParser();
       }

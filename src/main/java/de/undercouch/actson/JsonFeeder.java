@@ -23,6 +23,8 @@
 
 package de.undercouch.actson;
 
+import java.nio.charset.CharacterCodingException;
+
 /**
  * A feeder is used by {@link JsonParser} to get more input to parse.
  * @author Michel Kraemer
@@ -77,4 +79,26 @@ public interface JsonFeeder {
    * reached and that there is no more input to parse.
    */
   void done();
+  
+  /**
+   * @return true if the feeder has more input to be parsed
+   * @throws CharacterCodingException if the input data contains invalid
+   * characters
+   */
+  boolean hasInput() throws CharacterCodingException;
+  
+  /**
+   * @return true if the end of input has been reached
+   * @throws CharacterCodingException if the input data contains invalid
+   * characters
+   */
+  boolean isDone() throws CharacterCodingException;
+  
+  /**
+   * @return the next character to be parsed
+   * @throws IllegalStateException if there is no input to parse
+   * @throws CharacterCodingException if the input data contains invalid
+   * characters
+   */
+  char nextInput() throws CharacterCodingException;
 }

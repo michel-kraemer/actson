@@ -96,31 +96,18 @@ public class DefaultJsonFeeder implements JsonFeeder {
     return !byteBuf.hasRemaining();
   }
   
-  /**
-   * @return true if the feeder has more input to be parsed
-   * @throws CharacterCodingException if the input data contains invalid
-   * characters
-   */
+  @Override
   public boolean hasInput() throws CharacterCodingException {
     fillBuffer();
     return charBuf.hasRemaining();
   }
   
-  /**
-   * @return true if the end of input has been reached
-   * @throws CharacterCodingException if the input data contains invalid
-   * characters
-   */
+  @Override
   public boolean isDone() throws CharacterCodingException {
     return done && !hasInput();
   }
   
-  /**
-   * @return the next character to be parsed
-   * @throws IllegalStateException if there is no input to parse
-   * @throws CharacterCodingException if the input data contains invalid
-   * characters
-   */
+  @Override
   public char nextInput() throws CharacterCodingException {
     if (!hasInput()) {
       throw new IllegalStateException("Not enough input data");
