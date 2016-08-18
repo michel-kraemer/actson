@@ -1,6 +1,6 @@
 machine:
   java:
-    version: openjdk7
+    version: openjdk8
 test:
   override:
     - TERM=dumb ./gradlew --console=plain check jacocoTestReport
