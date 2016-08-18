@@ -40,13 +40,23 @@ do {
 } while (event != JsonEvent.EOF);
 ```
 
+Find more complex examples using [RxJava](https://github.com/ReactiveX/RxJava)
+or [Vert.x](http://vertx.io) below.
+
 ## Examples
 
 * [SimpleExample.java](examples/src/main/java/simple/SimpleExample.java)
   shows sequential usage of Actson (basically the same as the example above).
+* [RxJavaExample.java](examples/src/main/java/rxjava/RxJavaExample.java)
+  demonstrates how you can use Actson and [RxJava](https://github.com/ReactiveX/RxJava)
+  to parse JSON in an event-based manner. It uses an operator function
+  [JsonParserOperator.java](examples/src/main/java/rxjava/JsonParserOperator.java)
+  that can be lifted into an Observable to transform byte arrays to JSON
+  events.
 * [VertxExample.java](examples/src/main/java/vertx/VertxExample.java)
-  demonstrates how Actson can be used together with Vert.x. It does the same as
+  shows how Actson can be used together with Vert.x. It does the same as
   [SimpleExample.java](examples/src/main/java/simple/SimpleExample.java)
+  or [RxJavaExample.java](examples/src/main/java/rxjava/RxJavaExample.java)
   but works completely asynchronously and non-blocking.
 * [PrettyPrinter.java](src/test/java/de/undercouch/actson/PrettyPrinter.java)
   demonstrates how you can use Actson to pretty-print a JSON object or array.

@@ -34,8 +34,8 @@ import io.vertx.core.file.OpenOptions;
 
 /**
  * This example demonstrates how Actson can be used together with Vert.x. It
- * does the same as {@link simple.SimpleExample} but works completely
- * asynchronously and non-blocking.
+ * does the same as {@link simple.SimpleExample} or {@link rxjava.RxJavaExample}
+ * but works completely asynchronously and non-blocking.
  * @author Michel Kraemer
  */
 public class VertxExample {
