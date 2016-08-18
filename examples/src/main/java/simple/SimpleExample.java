@@ -21,7 +21,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-package de.undercouch.actson.examples.simple;
+package simple;
 
 import java.nio.charset.StandardCharsets;
 
@@ -32,7 +32,7 @@ import de.undercouch.actson.JsonParser;
  * A simple example demonstrating sequential usage of {@link JsonParser}
  * @author Michel Kraemer
  */
-public class Simple {
+public class SimpleExample {
   /**
    * The main program
    * @param args program arguments

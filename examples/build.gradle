@@ -1,0 +1,24 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile rootProject
+    compile 'io.reactivex:rxjava:1.1.9'
+    compile 'io.vertx:vertx-core:3.3.2'
+}
+
+eclipse {
+    jdt.file.withProperties { properties ->
+        properties['org.eclipse.jdt.core.formatter.indentation.size'] = '2'
+        properties['org.eclipse.jdt.core.formatter.tabulation.size'] = '2'
+        properties['org.eclipse.jdt.core.formatter.tabulation.char'] = 'space'
+    }
+}

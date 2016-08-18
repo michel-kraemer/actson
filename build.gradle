@@ -57,14 +57,10 @@ task packageSources(type: Jar) {
 }
 
 eclipse {
-    jdt {
-        file {
-            withProperties { properties ->
-                properties['org.eclipse.jdt.core.formatter.indentation.size'] = '2'
-                properties['org.eclipse.jdt.core.formatter.tabulation.size'] = '2'
-                properties['org.eclipse.jdt.core.formatter.tabulation.char'] = 'space'
-            }
-        }
+    jdt.file.withProperties { properties ->
+        properties['org.eclipse.jdt.core.formatter.indentation.size'] = '2'
+        properties['org.eclipse.jdt.core.formatter.tabulation.size'] = '2'
+        properties['org.eclipse.jdt.core.formatter.tabulation.char'] = 'space'
     }
 }
 

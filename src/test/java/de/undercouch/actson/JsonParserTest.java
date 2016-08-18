@@ -38,8 +38,6 @@ import org.junit.Test;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import de.undercouch.actson.examples.pretty.PrettyPrinter;
-
 /**
  * Tests {@link JsonParser}
  * @author Michel Kraemer
