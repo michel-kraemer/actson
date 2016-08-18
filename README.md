@@ -8,6 +8,20 @@ libraries/tool-kits such as [RxJava](https://github.com/ReactiveX/RxJava) or
 The library is very small and has no dependencies. It only requires Java 7
 (or higher).
 
+## Why another JSON parser?
+
+* **Non-blocking.** Other JSON parsers use blocking I/O (i.e. they read from an
+  `InputStream`). If you want to develop a reactive application you should use
+  non-blocking I/O (see the [Reactive Manifesto](http://www.reactivemanifesto.org/)).
+* **Big Data.** Most parsers read the full JSON text into memory to map it to
+  a POJO, for example. Actson can handle arbitrarily large JSON text. It is
+  event-based and can be used for streaming.
+* **GeoRocket.** Actson was primarily developed for [GeoRocket](http://georocket.io),
+  a high-performance reactive data store for geospatial files. We use
+  [Aalto XML](https://github.com/FasterXML/aalto-xml) to parse XML in a
+  non-blocking way and we needed something similar for GeoRocket's
+  [GeoJSON](http://geojson.org/) support.
+
 ## Usage
 
 The following snippet demonstrates how you can use the parser sequentially.
