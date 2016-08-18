@@ -65,10 +65,25 @@ public class DefaultJsonFeeder implements JsonFeeder {
   
   @Override
   public void feed(byte b) {
-    if (!byteBuf.hasRemaining()) {
+    if (isFull()) {
       throw new IllegalStateException("JSON parser is full");
     }
     byteBuf.put(b);
+  }
+  
+  @Override
+  public int feed(byte[] buf) {
+    return feed(buf, 0, buf.length);
+  }
+  
+  @Override
+  public int feed(byte[] buf, int offset, int len) {
+    int i = 0;
+    while (i < len && !isFull()) {
+      feed(buf[i + offset]);
+      ++i;
+    }
+    return i;
   }
   
   @Override

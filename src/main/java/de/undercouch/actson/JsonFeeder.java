@@ -38,6 +38,32 @@ public interface JsonFeeder {
   void feed(byte b);
   
   /**
+   * Provide more data to the {@link JsonParser}. The method will consume as
+   * many bytes from the input buffer as possible, either until all bytes have
+   * been consumed or until the feeder is full (see {@link #isFull()}).
+   * The method will return the number of bytes consumed (which can be 0 if the
+   * parser does not accept more input at the moment).
+   * @param buf the byte array containing the data to consume
+   * @return the number of bytes consumed (can be 0 if the parser does not accept
+   * more input at the moment, see {@link #isFull()})
+   */
+  int feed(byte[] buf);
+  
+  /**
+   * Provide more data to the {@link JsonParser}. The method will consume as
+   * many bytes from the input buffer as possible, either until <code>len</code>
+   * bytes have been consumed or until the feeder is full (see {@link #isFull()}).
+   * The method will return the number of bytes consumed (which can be 0 if the
+   * parser does not accept more input at the moment).
+   * @param buf the byte array containing the data to consume
+   * @param offset the start offset in the byte array
+   * @param len the number of bytes to consume
+   * @return the number of bytes consumed (can be 0 if the parser does not accept
+   * more input at the moment, see {@link #isFull()})
+   */
+  int feed(byte[] buf, int offset, int len);
+  
+  /**
    * Checks if the parser accepts more input at the moment. If it doesn't,
    * you have to call {@link JsonParser#nextEvent()} until it returns
    * {@link JsonEvent#NEED_MORE_INPUT}. Only then new input can be provided

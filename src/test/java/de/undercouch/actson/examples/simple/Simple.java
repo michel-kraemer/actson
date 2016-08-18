@@ -49,10 +49,7 @@ public class Simple {
       // proceed until the parser returns a new event or until it needs more input
       while ((event = parser.nextEvent()) == JsonEvent.NEED_MORE_INPUT) {
         // provide the parser with more input
-        while (!parser.getFeeder().isFull() && pos < json.length) {
-          parser.getFeeder().feed(json[pos]);
-          ++pos;
-        }
+        pos += parser.getFeeder().feed(json, pos, json.length - pos);
 
         // indicate end of input to the parser
         if (pos == json.length) {

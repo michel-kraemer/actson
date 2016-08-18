@@ -78,6 +78,59 @@ public class DefaultJsonFeederTest {
   }
   
   /**
+   * Test if the feeder accepts a byte array
+   * @throws CharacterCodingException if something goes wrong
+   */
+  @Test
+  public void feedBuf() throws CharacterCodingException {
+    byte[] buf = "abcd".getBytes(StandardCharsets.UTF_8);
+    
+    assertFalse(feeder.isFull());
+    assertFalse(feeder.hasInput());
+    
+    feeder.feed(buf);
+    
+    assertFalse(feeder.isFull());
+    assertTrue(feeder.hasInput());
+    
+    assertEquals('a', feeder.nextInput());
+    assertEquals('b', feeder.nextInput());
+    assertEquals('c', feeder.nextInput());
+    assertEquals('d', feeder.nextInput());
+    assertFalse(feeder.isFull());
+    assertFalse(feeder.hasInput());
+    
+    feeder.feed(buf);
+    assertFalse(feeder.isFull());
+    feeder.feed(buf);
+    assertFalse(feeder.isFull());
+    feeder.feed(buf);
+    assertFalse(feeder.isFull());
+    feeder.feed(buf);
+    assertTrue(feeder.isFull());
+  }
+  
+  /**
+   * Test if the feeder accepts a byte array
+   * @throws CharacterCodingException if something goes wrong
+   */
+  @Test
+  public void feedPartialBuf() throws CharacterCodingException {
+    byte[] buf = "----------------------abcd---------------"
+        .getBytes(StandardCharsets.UTF_8);
+    
+    feeder.feed(buf, 22, 4);
+    
+    assertFalse(feeder.isFull());
+    assertEquals('a', feeder.nextInput());
+    assertEquals('b', feeder.nextInput());
+    assertEquals('c', feeder.nextInput());
+    assertEquals('d', feeder.nextInput());
+    assertFalse(feeder.isFull());
+    assertFalse(feeder.hasInput());
+  }
+  
+  /**
    * Test if the {@link DefaultJsonFeeder#isDone()} method works correctly
    * @throws CharacterCodingException if something goes wrong
    */

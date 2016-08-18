@@ -74,10 +74,7 @@ public class JsonParserTest {
     int event;
     do {
       while ((event = parser.nextEvent()) == JsonEvent.NEED_MORE_INPUT) {
-        while (!parser.getFeeder().isFull() && i < buf.length) {
-          parser.getFeeder().feed(buf[i]);
-          ++i;
-        }
+        i += parser.getFeeder().feed(buf, i, buf.length - i);
         if (i == buf.length) {
           parser.getFeeder().done();
         }

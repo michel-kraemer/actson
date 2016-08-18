@@ -52,10 +52,7 @@ public class PrettyPrinter {
     int event;
     do {
       while ((event = parser.nextEvent()) == JsonEvent.NEED_MORE_INPUT) {
-        while (!parser.getFeeder().isFull() && i < json.length) {
-          parser.getFeeder().feed(json[i]);
-          ++i;
-        }
+        i += parser.getFeeder().feed(json, i, json.length - i);
         if (i == json.length) {
           parser.getFeeder().done();
         }
