@@ -29,6 +29,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.nio.charset.CharacterCodingException;
+import java.nio.charset.MalformedInputException;
 import java.nio.charset.StandardCharsets;
 
 import org.junit.Test;
@@ -72,6 +73,31 @@ public class DefaultJsonFeederTest {
       feeder.feed((byte)('a' + i));
     }
     assertTrue(feeder.isFull());
+  }
+  
+  /**
+   * Test if the {@link DefaultJsonFeeder#isDone()} method works correctly
+   * @throws CharacterCodingException if something goes wrong
+   */
+  @Test
+  public void isDone() throws CharacterCodingException {
+    assertFalse(feeder.isDone());
+    feeder.feed((byte)'a');
+    assertFalse(feeder.isDone());
+    feeder.done();
+    assertFalse(feeder.isDone());
+    feeder.nextInput();
+    assertTrue(feeder.isDone());
+  }
+  
+  /**
+   * Test if the feeder throws an exception if it is full
+   */
+  @Test(expected = IllegalStateException.class)
+  public void tooFull() {
+    for (int i = 0; i < 17; ++i) {
+      feeder.feed((byte)('a' + i));
+    }
   }
   
   /**
@@ -223,5 +249,16 @@ public class DefaultJsonFeederTest {
     char c = feeder.nextInput();
     assertEquals('\u0153', c);
     assertFalse(feeder.hasInput());
+  }
+  
+  /**
+   * Tests if the feeder throws an exception if the input is malformed
+   * @throws CharacterCodingException if the test is successful
+   */
+  @Test(expected = MalformedInputException.class)
+  public void illegalCharacter() throws CharacterCodingException {
+    feeder.feed((byte)0xff);
+    feeder.feed((byte)0xff);
+    feeder.nextInput();
   }
 }

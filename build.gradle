@@ -1,9 +1,10 @@
-apply plugin: 'maven'
-apply plugin: 'osgi'
-apply plugin: 'signing'
+apply plugin: 'jacoco'
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
+apply plugin: 'maven'
+apply plugin: 'osgi'
+apply plugin: 'signing'
 
 version = '1.0.0-SNAPSHOT'
 group = 'de.undercouch'
@@ -66,6 +67,15 @@ eclipse {
         }
     }
 }
+
+jacocoTestReport {
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+}
+
+check.dependsOn jacocoTestReport
 
 // define artifacts for upload
 artifacts {
