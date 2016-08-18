@@ -45,6 +45,8 @@ do {
 
 ## Examples
 
+* [Simple.java](src/test/java/de/undercouch/actson/examples/simple/Simple.java)
+  shows sequential usage of Actson (basically the same as the example above).
 * [PrettyPrinter.java](src/test/java/de/undercouch/actson/examples/pretty/PrettyPrinter.java)
   demonstrates how you can use Actson to pretty-print a JSON object or array.
   Note: this is no perfect implementation of a pretty-printer. The output could
