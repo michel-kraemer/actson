@@ -91,7 +91,9 @@ public class VertxExample {
           event = parser.nextEvent();
           
           // print all events to System.out
-          System.out.println("JSON event: " + event);
+          if (event != JsonEvent.NEED_MORE_INPUT) {
+            System.out.println("JSON event: " + event);
+          }
           
           // handle values, errors, and end of file
           if (event == JsonEvent.VALUE_STRING) {
