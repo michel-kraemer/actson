@@ -77,6 +77,31 @@ or [Vert.x](http://vertx.io) below.
   Note: this is no perfect implementation of a pretty-printer. The output could
   still be nicer. It's just a sample application.
 
+## Download
+
+Binaries and dependency information for Maven, Gradle, Ivy and others can be
+found at http://search.maven.org.
+
+Example for Maven:
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>de.undercouch</groupId>
+        <artifactId>actson</artifactId>
+        <version>1.0.0</version>
+    </dependency>
+</dependencies>
+```
+
+Example for Gradle:
+
+```gradle
+dependencies {
+    compile 'de.undercouch:actson:1.0.0'
+}
+```
+
 ## Building
 
 Execute the following command to compile the library and to run the
