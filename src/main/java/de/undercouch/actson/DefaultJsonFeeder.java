@@ -36,6 +36,7 @@ import java.nio.charset.UnmappableCharacterException;
  * Default implementation of {@link JsonFeeder} used internally by
  * the {@link JsonParser}.
  * @author Michel Kraemer
+ * @since 1.0.0
  */
 public class DefaultJsonFeeder implements JsonFeeder {
   private final ByteBuffer byteBuf;

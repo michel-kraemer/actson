@@ -26,8 +26,17 @@ package de.undercouch.actson;
 import java.nio.charset.CharacterCodingException;
 
 /**
- * A feeder is used by {@link JsonParser} to get more input to parse.
+ * A feeder can be used to provide more input data to the {@link JsonParser}.
+ * The caller has to take care to only feed as much data as the parser can
+ * process at the time. Use {@link #isFull()} to determine if the parser
+ * accepts more data. Then call {@link #feed(byte)} or {@link #feed(byte[], int, int)}
+ * until there is no more data to feed or until {@link #isFull()} returns
+ * <code>true</code>. Next call {@link JsonParser#nextEvent()} until it returns
+ * {@link JsonEvent#NEED_MORE_INPUT}. Repeat feeding and parsing until all
+ * input data has been consumed. Finally, call {@link #done()} to indicate the
+ * end of the JSON text.
  * @author Michel Kraemer
+ * @since 1.0.0
  */
 public interface JsonFeeder {
   /**
@@ -81,6 +90,7 @@ public interface JsonFeeder {
   void done();
   
   /**
+   * Determine if the feeder has input data that can be parsed
    * @return true if the feeder has more input to be parsed
    * @throws CharacterCodingException if the input data contains invalid
    * characters
@@ -88,6 +98,7 @@ public interface JsonFeeder {
   boolean hasInput() throws CharacterCodingException;
   
   /**
+   * Check if the end of the JSON text has been reached
    * @return true if the end of input has been reached
    * @throws CharacterCodingException if the input data contains invalid
    * characters
@@ -95,6 +106,7 @@ public interface JsonFeeder {
   boolean isDone() throws CharacterCodingException;
   
   /**
+   * Decode and return the next character to be parsed
    * @return the next character to be parsed
    * @throws IllegalStateException if there is no input to parse
    * @throws CharacterCodingException if the input data contains invalid

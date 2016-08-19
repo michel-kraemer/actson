@@ -27,6 +27,7 @@ package de.undercouch.actson;
  * A class containing all possible JSON events returned by
  * {@link JsonParser#nextEvent()}
  * @author Michel Kraemer
+ * @since 1.0.0
  */
 public interface JsonEvent {
   /**

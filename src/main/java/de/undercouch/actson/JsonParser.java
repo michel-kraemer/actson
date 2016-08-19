@@ -30,9 +30,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
- * A non-blocking, event-based JSON parser
+ * <p>A non-blocking, event-based JSON parser.</p>
+ * <p>The parser gets input data from a feeder that can be accessed through
+ * {@link #getFeeder()}. See {@link JsonFeeder} for more details.</p>
  * @author Michel Kraemer
  * @author JSON.org
+ * @since 1.0.0
  */
 public class JsonParser {
   private static final int __ = -1; // the universal error code
