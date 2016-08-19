@@ -35,7 +35,7 @@ JsonParser parser = new JsonParser(StandardCharsets.UTF_8);
 int pos = 0; // position in the input JSON text
 int event; // event returned by the parser
 do {
-    // proceed until the parser returns a new event or until it needs more input
+    // feed the parser until it returns a new event
     while ((event = parser.nextEvent()) == JsonEvent.NEED_MORE_INPUT) {
         // provide the parser with more input
         pos += parser.getFeeder().feed(json, pos, json.length - pos);
