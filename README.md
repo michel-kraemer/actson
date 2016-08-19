@@ -1,4 +1,4 @@
-# Actson [![CircleCI](https://img.shields.io/circleci/project/michel-kraemer/actson.svg?maxAge=2592000)](https://circleci.com/gh/michel-kraemer/actson) [![codecov](https://codecov.io/gh/michel-kraemer/actson/branch/master/graph/badge.svg)](https://codecov.io/gh/michel-kraemer/actson) [![Apache License, Version 2.0](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+# Actson [![CircleCI](https://img.shields.io/circleci/project/michel-kraemer/actson.svg?maxAge=2592000)](https://circleci.com/gh/michel-kraemer/actson) [![codecov](https://codecov.io/gh/michel-kraemer/actson/branch/master/graph/badge.svg)](https://codecov.io/gh/michel-kraemer/actson) [![Apache License, Version 2.0](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![Maven Central](https://img.shields.io/maven-central/v/de.undercouch/actson.svg?maxAge=2592000)](http://search.maven.org/#artifactdetails%7Cde.undercouch%7Cactson%7C1.0.0%7Cjar)
 
 Actson is a reactive JSON parser (sometimes referred to as non-blocking or
 asynchronous). It is event-based and can be used together with reactive
@@ -80,7 +80,7 @@ or [Vert.x](http://vertx.io) below.
 ## Download
 
 Binaries and dependency information for Maven, Gradle, Ivy and others can be
-found at http://search.maven.org.
+found at [http://search.maven.org](http://search.maven.org/#search%7Cga%7C1%7Cg:%22de.undercouch%22%20AND%20a:%22actson%22).
 
 Example for Maven:
 
