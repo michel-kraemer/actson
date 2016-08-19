@@ -23,6 +23,8 @@
 
 package vertx;
 
+import java.util.function.Supplier;
+
 import de.undercouch.actson.JsonEvent;
 import de.undercouch.actson.JsonParser;
 import io.vertx.core.AsyncResult;
@@ -84,7 +86,7 @@ public class VertxExample {
       JsonParser parser = new JsonParser();
       AsyncFile f = ar.result();
       
-      Runnable processEvents = () -> {
+      Supplier<Boolean> processEvents = () -> {
         // process events from the parser until it needs more input
         int event;
         do {
@@ -100,12 +102,14 @@ public class VertxExample {
             System.out.println("VALUE: " + parser.getCurrentString());
           } else if (event == JsonEvent.EOF) {
             handler.handle(Future.succeededFuture());
-            break;
+            return false;
           } else if (event == JsonEvent.ERROR) {
             handler.handle(Future.failedFuture("Syntax error"));
-            break;
+            return false;
           }
         } while (event != JsonEvent.NEED_MORE_INPUT);
+        
+        return true;
       };
       
       f.exceptionHandler(t -> {
@@ -118,14 +122,18 @@ public class VertxExample {
         int i = 0;
         while (i < bytes.length) {
           i += parser.getFeeder().feed(bytes, i, bytes.length - i);
-          processEvents.run();
+          if (!processEvents.get()) {
+            f.handler(null);
+            f.endHandler(null);
+            break;
+          }
         }
       });
       
       f.endHandler(v -> {
         // process events one last time
         parser.getFeeder().done();
-        processEvents.run();
+        processEvents.get();
       });
     });
   }
