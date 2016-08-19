@@ -43,8 +43,10 @@ public class JsonParserOperator implements Operator<Result, byte[]> {
    * Process events from the parser until it needs more input. Notify the
    * subscriber accordingly.
    * @param s the subscriber
+   * @return true if the caller should continue parsing, false if there was an
+   * error or if the end of the JSON text has been reached
    */
-  private void processEvents(Subscriber<? super Result> s) {
+  private boolean processEvents(Subscriber<? super Result> s) {
     int event;
     do {
       event = parser.nextEvent();
@@ -57,16 +59,18 @@ public class JsonParserOperator implements Operator<Result, byte[]> {
         // notify the subscriber that the observable has finished
         s.onNext(new Result(event));
         s.onCompleted();
-        break;
+        return false;
       } else if (event == JsonEvent.ERROR) {
         // notify the subscriber about the error
         s.onError(new IllegalStateException("Syntax error"));
-        break;
+        return false;
       } else if (event != JsonEvent.NEED_MORE_INPUT) {
         // forward JSON event
         s.onNext(new Result(event));
       }
     } while (event != JsonEvent.NEED_MORE_INPUT);
+    
+    return true;
   }
   
   @Override
@@ -99,7 +103,9 @@ public class JsonParserOperator implements Operator<Result, byte[]> {
         int i = 0;
         while (i < buf.length) {
           i += parser.getFeeder().feed(buf, i, buf.length - i);
-          processEvents(s);
+          if (!processEvents(s)) {
+            break;
+          }
         }
       }
     };
