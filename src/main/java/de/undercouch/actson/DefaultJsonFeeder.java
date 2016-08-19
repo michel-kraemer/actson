@@ -79,12 +79,18 @@ public class DefaultJsonFeeder implements JsonFeeder {
   
   @Override
   public int feed(byte[] buf, int offset, int len) {
-    int i = 0;
-    while (i < len && !isFull()) {
-      feed(buf[i + offset]);
+    int i = offset;
+    int j = offset + len;
+    int position = byteBuf.position();
+    int limit = byteBuf.limit();
+    byte[] arr = byteBuf.array();
+    while (i < j && position < limit) {
+      arr[position] = buf[i];
       ++i;
+      ++position;
     }
-    return i;
+    byteBuf.position(position);
+    return i - offset;
   }
   
   @Override
