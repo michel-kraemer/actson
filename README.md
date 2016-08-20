@@ -72,6 +72,11 @@ or [Vert.x](http://vertx.io) below.
   [SimpleExample.java](examples/src/main/java/simple/SimpleExample.java)
   or [RxJavaExample.java](examples/src/main/java/rxjava/RxJavaExample.java)
   but works completely asynchronously and non-blocking.
+* [WebServiceExample.java](examples/src/main/java/webservice/WebServiceExample.java)
+  combines Vert.x, RxJava and Actson to a reactive web service. The HTTP service
+  accepts JSON arrays and returns the number of elements in this array. It can
+  handle arbitrarily large files and multiple requests in parallel without
+  becoming unresponsive.
 * [PrettyPrinter.java](src/test/java/de/undercouch/actson/PrettyPrinter.java)
   demonstrates how you can use Actson to pretty-print a JSON object or array.
   Note: this is no perfect implementation of a pretty-printer. The output could

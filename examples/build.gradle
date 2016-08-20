@@ -13,6 +13,7 @@ dependencies {
     compile rootProject
     compile 'io.reactivex:rxjava:1.1.9'
     compile 'io.vertx:vertx-core:3.3.2'
+    compile 'io.vertx:vertx-rx-java:3.3.2'
 }
 
 eclipse {
