@@ -105,8 +105,7 @@ public class DefaultJsonFeeder implements JsonFeeder {
   
   @Override
   public boolean hasInput() throws CharacterCodingException {
-    fillBuffer();
-    return charBuf.hasRemaining();
+    return fillBuffer();
   }
   
   @Override
@@ -126,15 +125,16 @@ public class DefaultJsonFeeder implements JsonFeeder {
    * Decode bytes from {@link #byteBuf} and fill {@link #charBuf}. This method
    * is a no-op if {@link #charBuf} is not empty or if there are no bytes to
    * decode.
+   * @return true if the buffer contains bytes now, false if it's still empty
    * @throws CharacterCodingException if the input data contains invalid
    * characters
    */
-  private void fillBuffer() throws CharacterCodingException {
+  private boolean fillBuffer() throws CharacterCodingException {
     if (charBuf.hasRemaining()) {
-      return;
+      return true;
     }
     if (byteBuf.position() == 0) {
-      return;
+      return false;
     }
     
     charBuf.position(0);
@@ -151,5 +151,7 @@ public class DefaultJsonFeeder implements JsonFeeder {
     
     charBuf.flip();
     byteBuf.compact();
+    
+    return charBuf.hasRemaining();
   }
 }

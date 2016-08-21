@@ -310,8 +310,8 @@ public class JsonParser {
    * input is needed
    */
   public int nextEvent() {
-    while (event1 == JsonEvent.NEED_MORE_INPUT) {
-      try {
+    try {
+      while (event1 == JsonEvent.NEED_MORE_INPUT) {
         if (!feeder.hasInput()) {
           if (feeder.isDone()) {
             return (state == OK && pop(MODE_DONE) ? JsonEvent.EOF : JsonEvent.ERROR);
@@ -319,11 +319,11 @@ public class JsonParser {
           return JsonEvent.NEED_MORE_INPUT;
         }
         parse(feeder.nextInput());
-      } catch (CharacterCodingException e) {
-        return JsonEvent.ERROR;
       }
+    } catch (CharacterCodingException e) {
+      return JsonEvent.ERROR;
     }
-    
+  
     int r = event1;
     if (event1 != JsonEvent.ERROR) {
       event1 = event2;
