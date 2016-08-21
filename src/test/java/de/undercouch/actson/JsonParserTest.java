@@ -258,4 +258,14 @@ public class JsonParserTest {
     byte[] json = "{\"name\": \"\uffff\"}".getBytes(StandardCharsets.UTF_8);
     parseFail(json, new JsonParser(StandardCharsets.US_ASCII));
   }
+  
+  /**
+   * Test if a JSON text containing invalid characters cannot be parsed
+   * if the parser uses ASCII encoding
+   */
+  @Test
+  public void controlCharacter() {
+    byte[] json = "{\"name\": \"\u0001\"}".getBytes(StandardCharsets.UTF_8);
+    parseFail(json, new JsonParser(StandardCharsets.US_ASCII));
+  }
 }
