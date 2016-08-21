@@ -351,10 +351,6 @@ public class JsonParser {
   private void parse(char nextChar) {
     // Determine the character's class.
     int nextClass;
-    if (nextChar < 0) {
-        event1 = JsonEvent.ERROR;
-        return;
-    }
     if (nextChar >= 128) {
         nextClass = C_ETC;
     } else {
