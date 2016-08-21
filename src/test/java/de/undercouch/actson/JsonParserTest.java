@@ -167,20 +167,15 @@ public class JsonParserTest {
    */
   @Test
   public void testFail() throws IOException {
-    for (int i = 1; i <= 33; ++i) {
+    for (int i = 1; i <= 34; ++i) {
       URL u = getClass().getResource("fail" + i + ".txt");
       byte[] json = IOUtils.toByteArray(u);
-      JsonParser parser;
+      JsonParser parser = new JsonParser();
       
-      if (i == 18) {
-        // test for too many nested modes
-        parser = new JsonParser();
-        parser.setMaxDepth(16);
-        assertEquals(16, parser.getMaxDepth());
-      } else {
-        parser = new JsonParser();
-      }
-      
+      // test for too many nested modes
+      parser.setMaxDepth(16);
+      assertEquals(16, parser.getMaxDepth());
+
       parseFail(json, parser);
     }
   }
