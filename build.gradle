@@ -1,8 +1,17 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'org.standardout:gradle-eclipseconfig:1.0.0'
+    }
+}
+
 apply plugin: 'jacoco'
 apply plugin: 'java'
-apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'maven'
+apply plugin: 'org.standardout.eclipseconfig'
 apply plugin: 'osgi'
 apply plugin: 'signing'
 
@@ -54,14 +63,6 @@ task packageJavadoc(type: Jar, dependsOn: 'javadoc') {
 task packageSources(type: Jar) {
     from sourceSets.main.allSource
     classifier = 'sources'
-}
-
-eclipse {
-    jdt.file.withProperties { properties ->
-        properties['org.eclipse.jdt.core.formatter.indentation.size'] = '2'
-        properties['org.eclipse.jdt.core.formatter.tabulation.size'] = '2'
-        properties['org.eclipse.jdt.core.formatter.tabulation.char'] = 'space'
-    }
 }
 
 jacocoTestReport {
