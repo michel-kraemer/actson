@@ -62,7 +62,7 @@ public class WebServiceExample extends AbstractVerticle {
         System.exit(1);
       });
   }
-  
+
   @Override
   public void start(Future<Void> startFuture) {
     // deploy the web server
@@ -73,7 +73,7 @@ public class WebServiceExample extends AbstractVerticle {
     server.listenObservable(8080) // listen on port 8080
       .subscribe(v -> startFuture.complete(), startFuture::fail);
   }
-  
+
   /**
    * Handle an HTTP request
    * @param request the HTTP request
@@ -81,7 +81,7 @@ public class WebServiceExample extends AbstractVerticle {
   private void onRequest(HttpServerRequest request) {
     // count the hierarchical level in the JSON file
     AtomicInteger level = new AtomicInteger(0);
-    
+
     request.toObservable()
       .map(buf -> ((Buffer)buf.getDelegate()).getBytes())
       .lift(new JsonParserOperator()) // convert JSON file to JSON events
@@ -91,20 +91,20 @@ public class WebServiceExample extends AbstractVerticle {
           // skip EOF event
           return Observable.empty();
         }
-        
+
         int l = level.get();
         if (l == 0 && event != JsonEvent.START_ARRAY) {
           // check that the top-level element is an array
           return Observable.error(new IllegalStateException("Array expected"));
         }
-        
+
         // count hierarchical level
         if (event == JsonEvent.START_ARRAY || event == JsonEvent.START_OBJECT) {
           level.incrementAndGet();
         } else if (event == JsonEvent.END_ARRAY || event == JsonEvent.END_OBJECT) {
           level.decrementAndGet();
         }
-        
+
         if (l == 1 && event != JsonEvent.END_ARRAY) {
           // count all elements in level 1 (the top-level array)
           return Observable.just(null);

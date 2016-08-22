@@ -42,7 +42,7 @@ import io.vertx.core.file.OpenOptions;
  */
 public class VertxExample {
   private Vertx vertx = Vertx.vertx();
-  
+
   /**
    * The main program. Accepts one argument: the name of the file to parse
    * @param args the program arguments
@@ -52,7 +52,7 @@ public class VertxExample {
       System.err.println("Usage: VertxExample <json file>");
       System.exit(1);
     }
-    
+
     VertxExample example = new VertxExample();
     example.parseFile(args[0], ar -> {
       if (ar.failed()) {
@@ -64,7 +64,7 @@ public class VertxExample {
       }
     });
   }
-  
+
   /**
    * Asynchronously parse a file and print JSON events to System.out
    * @param filename the name of the JSON file to parse
@@ -75,28 +75,28 @@ public class VertxExample {
     OpenOptions options = new OpenOptions()
         .setRead(true)
         .setWrite(false);
-    
+
     // asynchronously open the file
     vertx.fileSystem().open(filename, options, ar -> {
       if (ar.failed()) {
         handler.handle(Future.failedFuture(ar.cause()));
         return;
       }
-      
+
       JsonParser parser = new JsonParser();
       AsyncFile f = ar.result();
-      
+
       Supplier<Boolean> processEvents = () -> {
         // process events from the parser until it needs more input
         int event;
         do {
           event = parser.nextEvent();
-          
+
           // print all events to System.out
           if (event != JsonEvent.NEED_MORE_INPUT) {
             System.out.println("JSON event: " + event);
           }
-          
+
           // handle values, errors, and end of file
           if (event == JsonEvent.VALUE_STRING) {
             System.out.println("VALUE: " + parser.getCurrentString());
@@ -108,14 +108,14 @@ public class VertxExample {
             return false;
           }
         } while (event != JsonEvent.NEED_MORE_INPUT);
-        
+
         return true;
       };
-      
+
       f.exceptionHandler(t -> {
         handler.handle(Future.failedFuture(t));
       });
-      
+
       f.handler(buf -> {
         // forward bytes read from the file to the parser
         byte[] bytes = buf.getBytes();
@@ -129,7 +129,7 @@ public class VertxExample {
           }
         }
       });
-      
+
       f.endHandler(v -> {
         // process events one last time
         parser.getFeeder().done();

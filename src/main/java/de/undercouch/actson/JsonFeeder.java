@@ -47,7 +47,7 @@ public interface JsonFeeder {
    * the moment (see {@link #isFull()})
    */
   void feed(byte b);
-  
+
   /**
    * Provide more data to the {@link JsonParser}. The method will consume as
    * many bytes from the input buffer as possible, either until all bytes have
@@ -59,7 +59,7 @@ public interface JsonFeeder {
    * more input at the moment, see {@link #isFull()})
    */
   int feed(byte[] buf);
-  
+
   /**
    * Provide more data to the {@link JsonParser}. The method will consume as
    * many bytes from the input buffer as possible, either until <code>len</code>
@@ -73,7 +73,7 @@ public interface JsonFeeder {
    * more input at the moment, see {@link #isFull()})
    */
   int feed(byte[] buf, int offset, int len);
-  
+
   /**
    * Checks if the parser accepts more input at the moment. If it doesn't,
    * you have to call {@link JsonParser#nextEvent()} until it returns
@@ -82,13 +82,13 @@ public interface JsonFeeder {
    * @return true if the parser does not accept more input
    */
   boolean isFull();
-  
+
   /**
    * Call this method to indicate that the end of the JSON text has been
    * reached and that there is no more input to parse.
    */
   void done();
-  
+
   /**
    * Determine if the feeder has input data that can be parsed
    * @return true if the feeder has more input to be parsed
@@ -96,7 +96,7 @@ public interface JsonFeeder {
    * characters
    */
   boolean hasInput() throws CharacterCodingException;
-  
+
   /**
    * Check if the end of the JSON text has been reached
    * @return true if the end of input has been reached
@@ -104,7 +104,7 @@ public interface JsonFeeder {
    * characters
    */
   boolean isDone() throws CharacterCodingException;
-  
+
   /**
    * Decode and return the next character to be parsed
    * @return the next character to be parsed

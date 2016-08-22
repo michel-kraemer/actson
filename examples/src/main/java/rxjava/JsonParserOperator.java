@@ -38,7 +38,7 @@ public class JsonParserOperator implements Operator<Result, byte[]> {
    * Non-blocking JSON parser
    */
   private JsonParser parser = new JsonParser();
-  
+
   /**
    * Process events from the parser until it needs more input. Notify the
    * subscriber accordingly.
@@ -50,7 +50,7 @@ public class JsonParserOperator implements Operator<Result, byte[]> {
     int event;
     do {
       event = parser.nextEvent();
-      
+
       // handle event and notify subscriber
       if (event == JsonEvent.VALUE_STRING) {
         // forward string values to subscriber
@@ -69,10 +69,10 @@ public class JsonParserOperator implements Operator<Result, byte[]> {
         s.onNext(new Result(event));
       }
     } while (event != JsonEvent.NEED_MORE_INPUT);
-    
+
     return true;
   }
-  
+
   @Override
   public Subscriber<? super byte[]> call(Subscriber<? super Result> s) {
     return new Subscriber<byte[]>(s) {
@@ -98,7 +98,7 @@ public class JsonParserOperator implements Operator<Result, byte[]> {
         if (s.isUnsubscribed()) {
           return;
         }
-        
+
         // push bytes into the parser and then process JSON events
         int i = 0;
         while (i < buf.length) {

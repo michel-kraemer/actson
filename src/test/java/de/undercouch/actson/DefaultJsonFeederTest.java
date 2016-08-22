@@ -43,7 +43,7 @@ import org.junit.Test;
 public class DefaultJsonFeederTest {
   private DefaultJsonFeeder feeder = new DefaultJsonFeeder(
       StandardCharsets.UTF_8, 16);
-  
+
   /**
    * Test if the feeder is empty at the beginning
    * @throws CharacterCodingException if something goes wrong
@@ -54,7 +54,7 @@ public class DefaultJsonFeederTest {
     assertFalse(feeder.isFull());
     assertFalse(feeder.isDone());
   }
-  
+
   /**
    * Test if the {@link DefaultJsonFeeder#hasInput()} method works correctly
    * @throws CharacterCodingException if something goes wrong
@@ -64,7 +64,7 @@ public class DefaultJsonFeederTest {
     feeder.feed((byte)'a');
     assertTrue(feeder.hasInput());
   }
-  
+
   /**
    * Test if the {@link DefaultJsonFeeder#isFull()} method works correctly
    */
@@ -76,7 +76,7 @@ public class DefaultJsonFeederTest {
     }
     assertTrue(feeder.isFull());
   }
-  
+
   /**
    * Test if the feeder accepts a byte array
    * @throws CharacterCodingException if something goes wrong
@@ -84,22 +84,22 @@ public class DefaultJsonFeederTest {
   @Test
   public void feedBuf() throws CharacterCodingException {
     byte[] buf = "abcd".getBytes(StandardCharsets.UTF_8);
-    
+
     assertFalse(feeder.isFull());
     assertFalse(feeder.hasInput());
-    
+
     feeder.feed(buf);
-    
+
     assertFalse(feeder.isFull());
     assertTrue(feeder.hasInput());
-    
+
     assertEquals('a', feeder.nextInput());
     assertEquals('b', feeder.nextInput());
     assertEquals('c', feeder.nextInput());
     assertEquals('d', feeder.nextInput());
     assertFalse(feeder.isFull());
     assertFalse(feeder.hasInput());
-    
+
     feeder.feed(buf);
     assertFalse(feeder.isFull());
     feeder.feed(buf);
@@ -109,7 +109,7 @@ public class DefaultJsonFeederTest {
     feeder.feed(buf);
     assertTrue(feeder.isFull());
   }
-  
+
   /**
    * Test if the feeder accepts a byte array
    * @throws CharacterCodingException if something goes wrong
@@ -118,9 +118,9 @@ public class DefaultJsonFeederTest {
   public void feedPartialBuf() throws CharacterCodingException {
     byte[] buf = "----------------------abcd---------------"
         .getBytes(StandardCharsets.UTF_8);
-    
+
     feeder.feed(buf, 22, 4);
-    
+
     assertFalse(feeder.isFull());
     assertEquals('a', feeder.nextInput());
     assertEquals('b', feeder.nextInput());
@@ -129,7 +129,7 @@ public class DefaultJsonFeederTest {
     assertFalse(feeder.isFull());
     assertFalse(feeder.hasInput());
   }
-  
+
   /**
    * Test if the {@link DefaultJsonFeeder#isDone()} method works correctly
    * @throws CharacterCodingException if something goes wrong
@@ -144,7 +144,7 @@ public class DefaultJsonFeederTest {
     feeder.nextInput();
     assertTrue(feeder.isDone());
   }
-  
+
   /**
    * Test if the feeder throws an exception if it is full
    */
@@ -154,7 +154,7 @@ public class DefaultJsonFeederTest {
       feeder.feed((byte)('a' + i));
     }
   }
-  
+
   /**
    * Test if a given string can be decoded correctly
    * @param expected the string to decode
@@ -178,7 +178,7 @@ public class DefaultJsonFeederTest {
     assertFalse(feeder.hasInput());
     assertFalse(feeder.isFull());
   }
-  
+
   /**
    * Test if a short string can be decoded correctly
    * @throws CharacterCodingException if something goes wrong
@@ -187,7 +187,7 @@ public class DefaultJsonFeederTest {
   public void shortString() throws CharacterCodingException {
     assertString("abcdef");
   }
-  
+
   /**
    * Test if a long string (longer than the feeder's buffer size)
    * can be decoded correctly
@@ -197,7 +197,7 @@ public class DefaultJsonFeederTest {
   public void longString() throws CharacterCodingException {
     assertString("abcdefghijklmnopqrstuvwxyz");
   }
-  
+
   /**
    * Test if a very long string (much longer than the feeder's buffer size)
    * can be decoded correctly
@@ -209,7 +209,7 @@ public class DefaultJsonFeederTest {
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
         "abcdefghijklmnopqrstuvwxyz");
   }
-  
+
   /**
    * Test if a short string containing unicode characters can be decoded
    * correctly
@@ -219,7 +219,7 @@ public class DefaultJsonFeederTest {
   public void shortUnicode() throws CharacterCodingException {
     assertString("abcd\u0153f");
   }
-  
+
   /**
    * Test if a long string (longer than the feeder's buffer size) containing
    * unicode characters can be decoded correctly
@@ -233,7 +233,7 @@ public class DefaultJsonFeederTest {
     }
     assertString(new String(str));
   }
-  
+
   /**
    * Test if a long string (longer than the feeder's buffer size) containing
    * normal and unicode characters can be decoded correctly. The test ensures
@@ -252,7 +252,7 @@ public class DefaultJsonFeederTest {
     }
     assertString(new String(str));
   }
-  
+
   /**
    * Test if a very long string (much longer than the feeder's buffer size)
    * containing normal and unicode characters can be decoded correctly. The
@@ -271,7 +271,7 @@ public class DefaultJsonFeederTest {
     }
     assertString(new String(str));
   }
-  
+
   /**
    * Test if the feeder can handle partial unicode characters
    * @throws CharacterCodingException if something goes wrong
@@ -285,7 +285,7 @@ public class DefaultJsonFeederTest {
     } catch (IllegalStateException e) {
       // OK
     }
-    
+
     // first part of a UTF-8 character
     feeder.feed((byte)197);
     assertFalse(feeder.hasInput());
@@ -295,17 +295,17 @@ public class DefaultJsonFeederTest {
     } catch (IllegalStateException e) {
       // OK
     }
-    
+
     // second part of a UTF-8 character
     feeder.feed((byte)147);
     assertTrue(feeder.hasInput());
-    
+
     // '\u0153' == [ (byte)197, (byte)147 ]
     char c = feeder.nextInput();
     assertEquals('\u0153', c);
     assertFalse(feeder.hasInput());
   }
-  
+
   /**
    * Tests if the feeder throws an exception if the input is malformed
    * @throws CharacterCodingException if the test is successful
@@ -316,7 +316,7 @@ public class DefaultJsonFeederTest {
     feeder.feed((byte)0xff);
     feeder.nextInput();
   }
-  
+
   /**
    * Tests if the feeder throws an exception if one of the output characters
    * is unmappable

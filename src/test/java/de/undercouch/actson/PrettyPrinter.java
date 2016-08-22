@@ -44,10 +44,10 @@ public class PrettyPrinter {
    */
   public static void main(String[] args) {
     byte[] json = "{\"name\":\"Elvis\"}".getBytes(StandardCharsets.UTF_8);
-    
+
     JsonParser parser = new JsonParser();
     PrettyPrinter prettyPrinter = new PrettyPrinter();
-    
+
     int i = 0;
     int event;
     do {
@@ -59,14 +59,14 @@ public class PrettyPrinter {
       }
       prettyPrinter.onEvent(event, parser);
     } while (event != JsonEvent.EOF);
-    
+
     System.out.println(prettyPrinter.getResult());
     // expected output:
     // {
     //   "name: "Elvis"
     // }
   }
-  
+
   private static enum Type {
     OBJECT, ARRAY
   }
@@ -75,7 +75,7 @@ public class PrettyPrinter {
   private Deque<Type> types = new ArrayDeque<>();
   private Deque<Integer> elementCounts = new ArrayDeque<>();
   private int level;
-  
+
   private void indent() {
     for (int i = 0; i < level; ++i) {
       result.append("  ");
@@ -160,7 +160,7 @@ public class PrettyPrinter {
     onValue();
     result.append("null");
   }
-  
+
   /**
    * Call this method on every JSON event. It will generate pretty JSON text.
    * @param event the JSON event returned by the parser
@@ -207,7 +207,7 @@ public class PrettyPrinter {
       throw new IllegalArgumentException("Unknown event: " + event);
     }
   }
-  
+
   /**
    * @return the pretty JSON string
    */

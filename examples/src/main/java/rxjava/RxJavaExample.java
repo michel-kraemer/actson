@@ -44,7 +44,7 @@ public class RxJavaExample {
     // JSON text to parse (split into two chunks for demonstration purpose)
     byte[] json_chunk1 = "{\"name\":\"El".getBytes(StandardCharsets.UTF_8);
     byte[] json_chunk2 = "vis\"}".getBytes(StandardCharsets.UTF_8);
-    
+
     // Start parsing. Note: we're using toBlocking() here just to make the
     // example work. In production you will most likely want to avoid this
     // method if your application should be non-blocking.

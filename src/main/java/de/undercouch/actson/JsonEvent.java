@@ -40,66 +40,66 @@ public interface JsonEvent {
    * Invoke the parser's feeder to give it more input.
    */
   public static final int NEED_MORE_INPUT = 0;
-  
+
   /**
    * The start of a JSON object.
    */
   public static final int START_OBJECT = 1;
-  
+
   /**
    * The end of a JSON object.
    */
   public static final int END_OBJECT = 2;
-  
+
   /**
    * The start of a JSON array.
    */
   public static final int START_ARRAY = 3;
-  
+
   /**
    * The end of a JSON array.
    */
   public static final int END_ARRAY = 4;
-  
+
   /**
    * A field name. Call {@link JsonParser#getCurrentString()}
    * to get the name.
    */
   public static final int FIELD_NAME = 5;
-  
+
   /**
    * A string value. Call {@link JsonParser#getCurrentString()}
    * to get the value.
    */
   public static final int VALUE_STRING = 6;
-  
+
   /**
    * An integer value. Call {@link JsonParser#getCurrentInt()}
    * to get the value.
    */
   public static final int VALUE_INT = 7;
-  
+
   /**
    * A double value. Call {@link JsonParser#getCurrentDouble()}
    * to get the value.
    */
   public static final int VALUE_DOUBLE = 8;
-  
+
   /**
    * The boolean value <code>true</code>.
    */
   public static final int VALUE_TRUE = 9;
-  
+
   /**
    * The boolean value <code>false</code>.
    */
   public static final int VALUE_FALSE = 10;
-  
+
   /**
    * A <code>null</code> value.
    */
   public static final int VALUE_NULL = 11;
-  
+
   /**
    * The end of the JSON text
    */

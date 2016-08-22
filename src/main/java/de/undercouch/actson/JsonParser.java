@@ -102,7 +102,7 @@ public class JsonParser {
     C_ETC,   C_ETC,   C_LOW_R, C_LOW_S, C_LOW_T, C_LOW_U, C_ETC,   C_ETC,
     C_ETC,   C_ETC,   C_ETC,   C_LCURB, C_ETC,   C_RCURB, C_ETC,   C_ETC
   };
-  
+
   /**
    * The state codes.
    */
@@ -185,43 +185,43 @@ public class JsonParser {
   private static final int MODE_DONE   = 1;
   private static final int MODE_KEY    = 2;
   private static final int MODE_OBJECT = 3;
-  
+
   /**
    * The stack containing the current modes
    */
   private int[] stack;
-  
+
   /**
    * The top of the stack (-1 if the stack is empty)
    */
   private int top = -1;
-  
+
   /**
    * The maximum number of modes on the stack
    */
   private int depth = 2048;
-  
+
   /**
    * The current state
    */
   private int state;
-  
+
   /**
    * Collects all characters if the current state is ST (String),
    * IN (Integer), FR (Fraction) or the like
    */
   private StringBuilder currentValue;
-  
+
   /**
    * The feeder is used to get input to parse
    */
   private final JsonFeeder feeder;
-  
+
   /**
    * The first event returned by {@link #parse(char)}
    */
   private int event1 = JsonEvent.NEED_MORE_INPUT;
-  
+
   /**
    * The second event returned by {@link #parse(char)}
    */
@@ -243,7 +243,7 @@ public class JsonParser {
     stack[top] = mode;
     return true;
   }
-  
+
   /**
    * Pop the stack, assuring that the current mode matches the expectation
    * @param mode the expected mode
@@ -256,14 +256,14 @@ public class JsonParser {
     --top;
     return true;
   }
-  
+
   /**
    * Constructs a JSON parser that uses the UTF-8 charset to decode input data
    */
   public JsonParser() {
     this(StandardCharsets.UTF_8);
   }
-  
+
   /**
    * Constructs a JSON parser
    * @param charset the charset that should be used to decode the
@@ -272,7 +272,7 @@ public class JsonParser {
   public JsonParser(Charset charset) {
     this(new DefaultJsonFeeder(charset));
   }
-  
+
   /**
    * Constructs the JSON parser
    * @param feeder the feeder that will provide the parser with input data
@@ -284,7 +284,7 @@ public class JsonParser {
     push(MODE_DONE);
     this.feeder = feeder;
   }
-  
+
   /**
    * Set the maximum number of modes on the stack (basically the maximum number
    * of nested objects/arrays in the JSON text to parse)
@@ -293,7 +293,7 @@ public class JsonParser {
   public void setMaxDepth(int depth) {
     this.depth = depth;
   }
-  
+
   /**
    * @return the maximum number of modes on the stack (basically the maximum
    * number of nested objects/arrays in the JSON text to parse)
@@ -301,7 +301,7 @@ public class JsonParser {
   public int getMaxDepth() {
     return depth;
   }
-  
+
   /**
    * Call this method to proceed parsing the JSON text and to get the next
    * event. The method returns {@link JsonEvent#NEED_MORE_INPUT} if it needs
@@ -323,16 +323,16 @@ public class JsonParser {
     } catch (CharacterCodingException e) {
       return JsonEvent.ERROR;
     }
-  
+
     int r = event1;
     if (event1 != JsonEvent.ERROR) {
       event1 = event2;
       event2 = JsonEvent.NEED_MORE_INPUT;
     }
-    
+
     return r;
   }
-  
+
   /**
    * Get the feeder that can be used to provide more input to the parser
    * @return the parser's feeder
@@ -360,7 +360,7 @@ public class JsonParser {
             return;
         }
     }
-    
+
     // Get the next state from the state transition table.
     int nextState = state_transition_table[state][nextClass];
     if (nextState >= 0) {
@@ -495,7 +495,7 @@ public class JsonParser {
       }
     }
   }
-  
+
   /**
    * Converts the current parser state to a JSON event
    * @return the JSON event or {@link JsonEvent#NEED_MORE_INPUT} if the
@@ -524,7 +524,7 @@ public class JsonParser {
   public String getCurrentString() {
     return currentValue.toString();
   }
-  
+
   /**
    * If the event returned by {@link #nextEvent()} was
    * {@link JsonEvent#VALUE_INT} this method will return the parsed integer
@@ -533,7 +533,7 @@ public class JsonParser {
   public int getCurrentInt() {
     return Integer.parseInt(currentValue.toString());
   }
-  
+
   /**
    * If the event returned by {@link #nextEvent()} was
    * {@link JsonEvent#VALUE_DOUBLE} this method will return the parsed double

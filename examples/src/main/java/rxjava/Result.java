@@ -31,7 +31,7 @@ package rxjava;
 public class Result {
   private final int event;
   private final Object value;
-  
+
   /**
    * Create a new result
    * @param event the JSON event
@@ -39,7 +39,7 @@ public class Result {
   public Result(int event) {
     this(event, null);
   }
-  
+
   /**
    * Create a new result
    * @param event the JSON event
@@ -49,14 +49,14 @@ public class Result {
     this.event = event;
     this.value = value;
   }
-  
+
   /**
    * @return the JSON event
    */
   public int getEvent() {
     return event;
   }
-  
+
   /**
    * @return the value
    */

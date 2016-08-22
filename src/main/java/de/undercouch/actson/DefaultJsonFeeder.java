@@ -43,7 +43,7 @@ public class DefaultJsonFeeder implements JsonFeeder {
   private final CharBuffer charBuf;
   private final CharsetDecoder decoder;
   private boolean done = false;
-  
+
   /**
    * Constructs a feeder
    * @param charset the charset that should be used to decode input data
@@ -51,7 +51,7 @@ public class DefaultJsonFeeder implements JsonFeeder {
   public DefaultJsonFeeder(Charset charset) {
     this(charset, 1024);
   }
-  
+
   /**
    * Constructs a feeder
    * @param charset the charset that should be used to decode input data
@@ -63,7 +63,7 @@ public class DefaultJsonFeeder implements JsonFeeder {
     charBuf.limit(0);
     decoder = charset.newDecoder();
   }
-  
+
   @Override
   public void feed(byte b) {
     if (isFull()) {
@@ -71,12 +71,12 @@ public class DefaultJsonFeeder implements JsonFeeder {
     }
     byteBuf.put(b);
   }
-  
+
   @Override
   public int feed(byte[] buf) {
     return feed(buf, 0, buf.length);
   }
-  
+
   @Override
   public int feed(byte[] buf, int offset, int len) {
     int i = offset;
@@ -92,27 +92,27 @@ public class DefaultJsonFeeder implements JsonFeeder {
     byteBuf.position(position);
     return i - offset;
   }
-  
+
   @Override
   public void done() {
     done = true;
   }
-  
+
   @Override
   public boolean isFull() {
     return !byteBuf.hasRemaining();
   }
-  
+
   @Override
   public boolean hasInput() throws CharacterCodingException {
     return fillBuffer();
   }
-  
+
   @Override
   public boolean isDone() throws CharacterCodingException {
     return done && !hasInput();
   }
-  
+
   @Override
   public char nextInput() throws CharacterCodingException {
     if (!hasInput()) {
@@ -120,7 +120,7 @@ public class DefaultJsonFeeder implements JsonFeeder {
     }
     return charBuf.get();
   }
-  
+
   /**
    * Decode bytes from {@link #byteBuf} and fill {@link #charBuf}. This method
    * is a no-op if {@link #charBuf} is not empty or if there are no bytes to
@@ -136,11 +136,11 @@ public class DefaultJsonFeeder implements JsonFeeder {
     if (byteBuf.position() == 0) {
       return false;
     }
-    
+
     charBuf.position(0);
     charBuf.limit(charBuf.capacity());
     byteBuf.flip();
-    
+
     CoderResult result = decoder.decode(byteBuf, charBuf, done);
     if (result.isMalformed()) {
       throw new MalformedInputException(result.length());
@@ -148,10 +148,10 @@ public class DefaultJsonFeeder implements JsonFeeder {
     if (result.isUnmappable()) {
       throw new UnmappableCharacterException(result.length());
     }
-    
+
     charBuf.flip();
     byteBuf.compact();
-    
+
     return charBuf.hasRemaining();
   }
 }
