@@ -213,6 +213,12 @@ public class JsonParser {
   private StringBuilder currentValue;
 
   /**
+   * The number of characters processed by the JSON parser
+   * @since 1.1.0
+   */
+  private int parsedCharacterCount = 0;
+
+  /**
    * The feeder is used to get input to parse
    */
   private final JsonFeeder feeder;
@@ -349,6 +355,8 @@ public class JsonParser {
    * @param nextChar the character to parse
    */
   private void parse(char nextChar) {
+    parsedCharacterCount++;
+
     // Determine the character's class.
     int nextClass;
     if (nextChar >= 128) {
@@ -541,5 +549,24 @@ public class JsonParser {
    */
   public double getCurrentDouble() {
     return Double.parseDouble(currentValue.toString());
+  }
+
+  /**
+   * <p>Get the number of characters processed by the JSON parser so far.</p>
+   * <p>Use this method to get the location of an event returned by
+   * {@link #nextEvent()}. Note that the character count is always greater than
+   * the actual position of the event in the parsed JSON text. For example, if
+   * {@link #nextEvent()} returns {@link JsonEvent#START_OBJECT} and the
+   * character count is <code>n</code>, the location of the <code>{</code>
+   * character is <code>n-1</code>. If {@link #nextEvent()} returns
+   * {@link JsonEvent#FIELD_NAME} and the parsed field name is
+   * <code>"id"</code>, the location is <code>n-4</code> because the field
+   * name is 4 characters long (including the quotes) and the parser has
+   * already processed all characters of it.</p>
+   * @return the character offset
+   * @since 1.1.0
+   */
+  public int getParsedCharacterCount() {
+    return parsedCharacterCount;
   }
 }
