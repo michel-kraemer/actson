@@ -394,117 +394,125 @@ public class JsonParser {
       state = nextState;
     } else {
       // Or perform one of the actions.
-      switch (nextState) {
-      // empty }
-      case -9:
-        if (!pop(MODE_KEY)) {
-          event1 = JsonEvent.ERROR;
-          return;
-        }
+      performAction(nextState);
+    }
+  }
+
+  /**
+   * Perform an action that changes the parser state
+   * @param action the action to perform
+   */
+  private void performAction(byte action) {
+    switch (action) {
+    // empty }
+    case -9:
+      if (!pop(MODE_KEY)) {
+        event1 = JsonEvent.ERROR;
+        return;
+      }
+      state = OK;
+      event1 = JsonEvent.END_OBJECT;
+      break;
+
+    // }
+    case -8:
+      if (!pop(MODE_OBJECT)) {
+        event1 = JsonEvent.ERROR;
+        return;
+      }
+      state = OK;
+      event1 = JsonEvent.END_OBJECT;
+      break;
+
+    // ]
+    case -7:
+      if (!pop(MODE_ARRAY)) {
+        event1 = JsonEvent.ERROR;
+        return;
+      }
+      event1 = stateToEvent();
+      if (event1 == JsonEvent.NEED_MORE_INPUT) {
+        event1 = JsonEvent.END_ARRAY;
+      } else {
+        event2 = JsonEvent.END_ARRAY;
+      }
+      state = OK;
+      break;
+
+    // {
+    case -6:
+      if (!push(MODE_KEY)) {
+        event1 = JsonEvent.ERROR;
+        return;
+      }
+      state = OB;
+      event1 = JsonEvent.START_OBJECT;
+      break;
+
+    // [
+    case -5:
+      if (!push(MODE_ARRAY)) {
+        event1 = JsonEvent.ERROR;
+        return;
+      }
+      state = AR;
+      event1 = JsonEvent.START_ARRAY;
+      break;
+
+    // "
+    case -4:
+      switch (stack[top]) {
+      case MODE_KEY:
+        state = CO;
+        event1 = JsonEvent.FIELD_NAME;
+        break;
+      case MODE_ARRAY:
+      case MODE_OBJECT:
         state = OK;
-        event1 = JsonEvent.END_OBJECT;
+        event1 = JsonEvent.VALUE_STRING;
         break;
-
-      // }
-      case -8:
-        if (!pop(MODE_OBJECT)) {
-          event1 = JsonEvent.ERROR;
-          return;
-        }
-        state = OK;
-        event1 = JsonEvent.END_OBJECT;
-        break;
-
-      // ]
-      case -7:
-        if (!pop(MODE_ARRAY)) {
-          event1 = JsonEvent.ERROR;
-          return;
-        }
-        event1 = stateToEvent();
-        if (event1 == JsonEvent.NEED_MORE_INPUT) {
-          event1 = JsonEvent.END_ARRAY;
-        } else {
-          event2 = JsonEvent.END_ARRAY;
-        }
-        state = OK;
-        break;
-
-      // {
-      case -6:
-        if (!push(MODE_KEY)) {
-          event1 = JsonEvent.ERROR;
-          return;
-        }
-        state = OB;
-        event1 = JsonEvent.START_OBJECT;
-        break;
-
-      // [
-      case -5:
-        if (!push(MODE_ARRAY)) {
-          event1 = JsonEvent.ERROR;
-          return;
-        }
-        state = AR;
-        event1 = JsonEvent.START_ARRAY;
-        break;
-
-      // "
-      case -4:
-        switch (stack[top]) {
-        case MODE_KEY:
-          state = CO;
-          event1 = JsonEvent.FIELD_NAME;
-          break;
-        case MODE_ARRAY:
-        case MODE_OBJECT:
-          state = OK;
-          event1 = JsonEvent.VALUE_STRING;
-          break;
-        default:
-          event1 = JsonEvent.ERROR;
-          return;
-        }
-        break;
-
-      // ,
-      case -3:
-        switch (stack[top]) {
-        case MODE_OBJECT:
-          // A comma causes a flip from object mode to key mode.
-          if (!pop(MODE_OBJECT) || !push(MODE_KEY)) {
-            event1 = JsonEvent.ERROR;
-            return;
-          }
-          event1 = stateToEvent();
-          state = KE;
-          break;
-        case MODE_ARRAY:
-          event1 = stateToEvent();
-          state = VA;
-          break;
-        default:
-          event1 = JsonEvent.ERROR;
-          return;
-        }
-        break;
-
-      // :
-      case -2:
-        // A colon causes a flip from key mode to object mode.
-        if (!pop(MODE_KEY) || !push(MODE_OBJECT)) {
-          event1 = JsonEvent.ERROR;
-          return;
-        }
-        state = VA;
-        break;
-
-      // Bad action.
       default:
         event1 = JsonEvent.ERROR;
         return;
       }
+      break;
+
+    // ,
+    case -3:
+      switch (stack[top]) {
+      case MODE_OBJECT:
+        // A comma causes a flip from object mode to key mode.
+        if (!pop(MODE_OBJECT) || !push(MODE_KEY)) {
+          event1 = JsonEvent.ERROR;
+          return;
+        }
+        event1 = stateToEvent();
+        state = KE;
+        break;
+      case MODE_ARRAY:
+        event1 = stateToEvent();
+        state = VA;
+        break;
+      default:
+        event1 = JsonEvent.ERROR;
+        return;
+      }
+      break;
+
+    // :
+    case -2:
+      // A colon causes a flip from key mode to object mode.
+      if (!pop(MODE_KEY) || !push(MODE_OBJECT)) {
+        event1 = JsonEvent.ERROR;
+        return;
+      }
+      state = VA;
+      break;
+
+    // Bad action.
+    default:
+      event1 = JsonEvent.ERROR;
+      return;
     }
   }
 
