@@ -373,13 +373,17 @@ public class JsonParser {
     byte nextState = state_transition_table[(state << 5) + nextClass];
     if (nextState >= 0) {
       if (nextState >= ST && nextState <= E3) {
-        if (state < ST || state > E3) {
+        // According to the 'state_transition_table' we don't need to check
+        // for "state <= E3". There is no way we can get here without 'state'
+        // being less than or equal to E3.
+        // if (state >= ST && state <= E3) {
+        if (state >= ST) {
+          currentValue.append(nextChar);
+        } else {
           currentValue.setLength(0);
           if (nextState != ST) {
             currentValue.append(nextChar);
           }
-        } else {
-          currentValue.append(nextChar);
         }
       } else if (nextState == OK) {
         // end of token identified, convert state to result
