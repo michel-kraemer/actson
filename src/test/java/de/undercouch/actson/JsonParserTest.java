@@ -302,4 +302,15 @@ public class JsonParserTest {
     assertEquals(17, parser.getParsedCharacterCount());
     assertEquals('}', jsonStr.charAt(parser.getParsedCharacterCount() - 1));
   }
+
+  /**
+   * Test what happens if {@link JsonParser#nextEvent} is called too many times
+   */
+  @Test
+  public void tooManyNextEvent() {
+    String json = "{}";
+    JsonParser parser = new JsonParser();
+    assertJsonObjectEquals(json, parse(json, parser));
+    assertEquals(JsonEvent.ERROR, parser.nextEvent());
+  }
 }
