@@ -210,7 +210,7 @@ public class JsonParser {
    * Collects all characters if the current state is ST (String),
    * IN (Integer), FR (Fraction) or the like
    */
-  private StringBuilder currentValue;
+  private StringBuilder currentValue = new StringBuilder(128);
 
   /**
    * The number of characters processed by the JSON parser
@@ -374,7 +374,7 @@ public class JsonParser {
     if (nextState >= 0) {
       if (nextState >= ST && nextState <= E3) {
         if (state < ST || state > E3) {
-          currentValue = new StringBuilder();
+          currentValue.setLength(0);
           if (nextState != ST) {
             currentValue.append(nextChar);
           }
