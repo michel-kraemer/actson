@@ -38,50 +38,50 @@ import java.util.Arrays;
  * @since 1.0.0
  */
 public class JsonParser {
-  private static final int __ = -1; // the universal error code
+  private static final byte __ = -1; // the universal error code
 
   /**
    * Characters are mapped into these 31 character classes. This allows for
    * a significant reduction in the size of the state transition table.
    */
-  private static final int C_SPACE =  0;  // space
-  private static final int C_WHITE =  1;  // other whitespace
-  private static final int C_LCURB =  2;  // {
-  private static final int C_RCURB =  3;  // }
-  private static final int C_LSQRB =  4;  // [
-  private static final int C_RSQRB =  5;  // ]
-  private static final int C_COLON =  6;  // :
-  private static final int C_COMMA =  7;  // ,
-  private static final int C_QUOTE =  8;  // "
-  private static final int C_BACKS =  9;  // \
-  private static final int C_SLASH = 10;  // /
-  private static final int C_PLUS  = 11;  // +
-  private static final int C_MINUS = 12;  // -
-  private static final int C_POINT = 13;  // .
-  private static final int C_ZERO  = 14;  // 0
-  private static final int C_DIGIT = 15;  // 123456789
-  private static final int C_LOW_A = 16;  // a
-  private static final int C_LOW_B = 17;  // b
-  private static final int C_LOW_C = 18;  // c
-  private static final int C_LOW_D = 19;  // d
-  private static final int C_LOW_E = 20;  // e
-  private static final int C_LOW_F = 21;  // f
-  private static final int C_LOW_L = 22;  // l
-  private static final int C_LOW_N = 23;  // n
-  private static final int C_LOW_R = 24;  // r
-  private static final int C_LOW_S = 25;  // s
-  private static final int C_LOW_T = 26;  // t
-  private static final int C_LOW_U = 27;  // u
-  private static final int C_ABCDF = 28;  // ABCDF
-  private static final int C_E     = 29;  // E
-  private static final int C_ETC   = 30;  // everything else
+  private static final byte C_SPACE =  0;  // space
+  private static final byte C_WHITE =  1;  // other whitespace
+  private static final byte C_LCURB =  2;  // {
+  private static final byte C_RCURB =  3;  // }
+  private static final byte C_LSQRB =  4;  // [
+  private static final byte C_RSQRB =  5;  // ]
+  private static final byte C_COLON =  6;  // :
+  private static final byte C_COMMA =  7;  // ,
+  private static final byte C_QUOTE =  8;  // "
+  private static final byte C_BACKS =  9;  // \
+  private static final byte C_SLASH = 10;  // /
+  private static final byte C_PLUS  = 11;  // +
+  private static final byte C_MINUS = 12;  // -
+  private static final byte C_POINT = 13;  // .
+  private static final byte C_ZERO  = 14;  // 0
+  private static final byte C_DIGIT = 15;  // 123456789
+  private static final byte C_LOW_A = 16;  // a
+  private static final byte C_LOW_B = 17;  // b
+  private static final byte C_LOW_C = 18;  // c
+  private static final byte C_LOW_D = 19;  // d
+  private static final byte C_LOW_E = 20;  // e
+  private static final byte C_LOW_F = 21;  // f
+  private static final byte C_LOW_L = 22;  // l
+  private static final byte C_LOW_N = 23;  // n
+  private static final byte C_LOW_R = 24;  // r
+  private static final byte C_LOW_S = 25;  // s
+  private static final byte C_LOW_T = 26;  // t
+  private static final byte C_LOW_U = 27;  // u
+  private static final byte C_ABCDF = 28;  // ABCDF
+  private static final byte C_E     = 29;  // E
+  private static final byte C_ETC   = 30;  // everything else
 
   /**
    * This array maps the 128 ASCII characters into character classes.
    * The remaining Unicode characters should be mapped to C_ETC.
    * Non-whitespace control characters are errors.
    */
-  private final static int[] ascii_class = {
+  private final static byte[] ascii_class = {
     __,      __,      __,      __,      __,      __,      __,      __,
     __,      C_WHITE, C_WHITE, __,      __,      C_WHITE, __,      __,
     __,      __,      __,      __,      __,      __,      __,      __,
@@ -106,36 +106,36 @@ public class JsonParser {
   /**
    * The state codes.
    */
-  private static final int GO =  0;  // start
-  private static final int OK =  1;  // ok
-  private static final int OB =  2;  // object
-  private static final int KE =  3;  // key
-  private static final int CO =  4;  // colon
-  private static final int VA =  5;  // value
-  private static final int AR =  6;  // array
-  private static final int ST =  7;  // string
-  private static final int ES =  8;  // escape
-  private static final int U1 =  9;  // u1
-  private static final int U2 = 10;  // u2
-  private static final int U3 = 11;  // u3
-  private static final int U4 = 12;  // u4
-  private static final int MI = 13;  // minus
-  private static final int ZE = 14;  // zero
-  private static final int IN = 15;  // integer
-  private static final int FR = 16;  // fraction
-  private static final int E1 = 17;  // e
-  private static final int E2 = 18;  // ex
-  private static final int E3 = 19;  // exp
-  private static final int T1 = 20;  // tr
-  private static final int T2 = 21;  // tru
-  private static final int T3 = 22;  // true
-  private static final int F1 = 23;  // fa
-  private static final int F2 = 24;  // fal
-  private static final int F3 = 25;  // fals
-  private static final int F4 = 26;  // false
-  private static final int N1 = 27;  // nu
-  private static final int N2 = 28;  // nul
-  private static final int N3 = 29;  // null
+  private static final byte GO =  0;  // start
+  private static final byte OK =  1;  // ok
+  private static final byte OB =  2;  // object
+  private static final byte KE =  3;  // key
+  private static final byte CO =  4;  // colon
+  private static final byte VA =  5;  // value
+  private static final byte AR =  6;  // array
+  private static final byte ST =  7;  // string
+  private static final byte ES =  8;  // escape
+  private static final byte U1 =  9;  // u1
+  private static final byte U2 = 10;  // u2
+  private static final byte U3 = 11;  // u3
+  private static final byte U4 = 12;  // u4
+  private static final byte MI = 13;  // minus
+  private static final byte ZE = 14;  // zero
+  private static final byte IN = 15;  // integer
+  private static final byte FR = 16;  // fraction
+  private static final byte E1 = 17;  // e
+  private static final byte E2 = 18;  // ex
+  private static final byte E3 = 19;  // exp
+  private static final byte T1 = 20;  // tr
+  private static final byte T2 = 21;  // tru
+  private static final byte T3 = 22;  // true
+  private static final byte F1 = 23;  // fa
+  private static final byte F2 = 24;  // fal
+  private static final byte F3 = 25;  // fals
+  private static final byte F4 = 26;  // false
+  private static final byte N1 = 27;  // nu
+  private static final byte N2 = 28;  // nul
+  private static final byte N3 = 29;  // null
 
   /**
    * The state transition table takes the current state and the current symbol,
@@ -143,53 +143,53 @@ public class JsonParser {
    * negative number. A JSON text is accepted if at the end of the text the
    * state is OK and if the mode is MODE_DONE.
    */
-  private static int[][] state_transition_table = {
+  private static byte[] state_transition_table = {
   /*               white                                      1-9                                   ABCDF  etc
-               space |  {  }  [  ]  :  ,  "  \  /  +  -  .  0  |  a  b  c  d  e  f  l  n  r  s  t  u  |  E  |*/
-  /*start  GO*/ {GO,GO,-6,__,-5,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__},
-  /*ok     OK*/ {OK,OK,__,-8,__,-7,__,-3,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__},
-  /*object OB*/ {OB,OB,__,-9,__,__,__,__,ST,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__},
-  /*key    KE*/ {KE,KE,__,__,__,__,__,__,ST,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__},
-  /*colon  CO*/ {CO,CO,__,__,__,__,-2,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__},
-  /*value  VA*/ {VA,VA,-6,__,-5,__,__,__,ST,__,__,__,MI,__,ZE,IN,__,__,__,__,__,F1,__,N1,__,__,T1,__,__,__,__},
-  /*array  AR*/ {AR,AR,-6,__,-5,-7,__,__,ST,__,__,__,MI,__,ZE,IN,__,__,__,__,__,F1,__,N1,__,__,T1,__,__,__,__},
-  /*string ST*/ {ST,__,ST,ST,ST,ST,ST,ST,-4,ES,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST},
-  /*escape ES*/ {__,__,__,__,__,__,__,__,ST,ST,ST,__,__,__,__,__,__,ST,__,__,__,ST,__,ST,ST,__,ST,U1,__,__,__},
-  /*u1     U1*/ {__,__,__,__,__,__,__,__,__,__,__,__,__,__,U2,U2,U2,U2,U2,U2,U2,U2,__,__,__,__,__,__,U2,U2,__},
-  /*u2     U2*/ {__,__,__,__,__,__,__,__,__,__,__,__,__,__,U3,U3,U3,U3,U3,U3,U3,U3,__,__,__,__,__,__,U3,U3,__},
-  /*u3     U3*/ {__,__,__,__,__,__,__,__,__,__,__,__,__,__,U4,U4,U4,U4,U4,U4,U4,U4,__,__,__,__,__,__,U4,U4,__},
-  /*u4     U4*/ {__,__,__,__,__,__,__,__,__,__,__,__,__,__,ST,ST,ST,ST,ST,ST,ST,ST,__,__,__,__,__,__,ST,ST,__},
-  /*minus  MI*/ {__,__,__,__,__,__,__,__,__,__,__,__,__,__,ZE,IN,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__},
-  /*zero   ZE*/ {OK,OK,__,-8,__,-7,__,-3,__,__,__,__,__,FR,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__},
-  /*int    IN*/ {OK,OK,__,-8,__,-7,__,-3,__,__,__,__,__,FR,IN,IN,__,__,__,__,E1,__,__,__,__,__,__,__,__,E1,__},
-  /*frac   FR*/ {OK,OK,__,-8,__,-7,__,-3,__,__,__,__,__,__,FR,FR,__,__,__,__,E1,__,__,__,__,__,__,__,__,E1,__},
-  /*e      E1*/ {__,__,__,__,__,__,__,__,__,__,__,E2,E2,__,E3,E3,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__},
-  /*ex     E2*/ {__,__,__,__,__,__,__,__,__,__,__,__,__,__,E3,E3,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__},
-  /*exp    E3*/ {OK,OK,__,-8,__,-7,__,-3,__,__,__,__,__,__,E3,E3,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__},
-  /*tr     T1*/ {__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,T2,__,__,__,__,__,__},
-  /*tru    T2*/ {__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,T3,__,__,__},
-  /*true   T3*/ {__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,OK,__,__,__,__,__,__,__,__,__,__},
-  /*fa     F1*/ {__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,F2,__,__,__,__,__,__,__,__,__,__,__,__,__,__},
-  /*fal    F2*/ {__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,F3,__,__,__,__,__,__,__,__},
-  /*fals   F3*/ {__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,F4,__,__,__,__,__},
-  /*false  F4*/ {__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,OK,__,__,__,__,__,__,__,__,__,__},
-  /*nu     N1*/ {__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,N2,__,__,__},
-  /*nul    N2*/ {__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,N3,__,__,__,__,__,__,__,__},
-  /*null   N3*/ {__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,OK,__,__,__,__,__,__,__,__},
+               space |  {  }  [  ]  :  ,  "  \  /  +  -  .  0  |  a  b  c  d  e  f  l  n  r  s  t  u  |  E  | pad */
+  /*start  GO*/  GO,GO,-6,__,-5,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,
+  /*ok     OK*/  OK,OK,__,-8,__,-7,__,-3,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,
+  /*object OB*/  OB,OB,__,-9,__,__,__,__,ST,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,
+  /*key    KE*/  KE,KE,__,__,__,__,__,__,ST,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,
+  /*colon  CO*/  CO,CO,__,__,__,__,-2,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,
+  /*value  VA*/  VA,VA,-6,__,-5,__,__,__,ST,__,__,__,MI,__,ZE,IN,__,__,__,__,__,F1,__,N1,__,__,T1,__,__,__,__,__,
+  /*array  AR*/  AR,AR,-6,__,-5,-7,__,__,ST,__,__,__,MI,__,ZE,IN,__,__,__,__,__,F1,__,N1,__,__,T1,__,__,__,__,__,
+  /*string ST*/  ST,__,ST,ST,ST,ST,ST,ST,-4,ES,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,__,
+  /*escape ES*/  __,__,__,__,__,__,__,__,ST,ST,ST,__,__,__,__,__,__,ST,__,__,__,ST,__,ST,ST,__,ST,U1,__,__,__,__,
+  /*u1     U1*/  __,__,__,__,__,__,__,__,__,__,__,__,__,__,U2,U2,U2,U2,U2,U2,U2,U2,__,__,__,__,__,__,U2,U2,__,__,
+  /*u2     U2*/  __,__,__,__,__,__,__,__,__,__,__,__,__,__,U3,U3,U3,U3,U3,U3,U3,U3,__,__,__,__,__,__,U3,U3,__,__,
+  /*u3     U3*/  __,__,__,__,__,__,__,__,__,__,__,__,__,__,U4,U4,U4,U4,U4,U4,U4,U4,__,__,__,__,__,__,U4,U4,__,__,
+  /*u4     U4*/  __,__,__,__,__,__,__,__,__,__,__,__,__,__,ST,ST,ST,ST,ST,ST,ST,ST,__,__,__,__,__,__,ST,ST,__,__,
+  /*minus  MI*/  __,__,__,__,__,__,__,__,__,__,__,__,__,__,ZE,IN,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,
+  /*zero   ZE*/  OK,OK,__,-8,__,-7,__,-3,__,__,__,__,__,FR,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,
+  /*int    IN*/  OK,OK,__,-8,__,-7,__,-3,__,__,__,__,__,FR,IN,IN,__,__,__,__,E1,__,__,__,__,__,__,__,__,E1,__,__,
+  /*frac   FR*/  OK,OK,__,-8,__,-7,__,-3,__,__,__,__,__,__,FR,FR,__,__,__,__,E1,__,__,__,__,__,__,__,__,E1,__,__,
+  /*e      E1*/  __,__,__,__,__,__,__,__,__,__,__,E2,E2,__,E3,E3,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,
+  /*ex     E2*/  __,__,__,__,__,__,__,__,__,__,__,__,__,__,E3,E3,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,
+  /*exp    E3*/  OK,OK,__,-8,__,-7,__,-3,__,__,__,__,__,__,E3,E3,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,
+  /*tr     T1*/  __,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,T2,__,__,__,__,__,__,__,
+  /*tru    T2*/  __,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,T3,__,__,__,__,
+  /*true   T3*/  __,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,OK,__,__,__,__,__,__,__,__,__,__,__,
+  /*fa     F1*/  __,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,F2,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,
+  /*fal    F2*/  __,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,F3,__,__,__,__,__,__,__,__,__,
+  /*fals   F3*/  __,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,F4,__,__,__,__,__,__,
+  /*false  F4*/  __,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,OK,__,__,__,__,__,__,__,__,__,__,__,
+  /*nu     N1*/  __,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,N2,__,__,__,__,
+  /*nul    N2*/  __,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,N3,__,__,__,__,__,__,__,__,__,
+  /*null   N3*/  __,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,OK,__,__,__,__,__,__,__,__,__,
   };
 
   /**
    * These modes can be pushed on the stack.
    */
-  private static final int MODE_ARRAY  = 0;
-  private static final int MODE_DONE   = 1;
-  private static final int MODE_KEY    = 2;
-  private static final int MODE_OBJECT = 3;
+  private static final byte MODE_ARRAY  = 0;
+  private static final byte MODE_DONE   = 1;
+  private static final byte MODE_KEY    = 2;
+  private static final byte MODE_OBJECT = 3;
 
   /**
    * The stack containing the current modes
    */
-  private int[] stack;
+  private byte[] stack;
 
   /**
    * The top of the stack (-1 if the stack is empty)
@@ -238,7 +238,7 @@ public class JsonParser {
    * @param mode the mode to push
    * @return false if there is overflow
    */
-  private boolean push(int mode) {
+  private boolean push(byte mode) {
     ++top;
     if (top >= stack.length) {
       if (top >= depth) {
@@ -255,7 +255,7 @@ public class JsonParser {
    * @param mode the expected mode
    * @return false if there is underflow or if the modes mismatch
    */
-  private boolean pop(int mode) {
+  private boolean pop(byte mode) {
     if (top < 0 || stack[top] != mode) {
       return false;
     }
@@ -284,7 +284,7 @@ public class JsonParser {
    * @param feeder the feeder that will provide the parser with input data
    */
   public JsonParser(JsonFeeder feeder) {
-    stack = new int[16];
+    stack = new byte[16];
     top = -1;
     state = GO;
     push(MODE_DONE);
@@ -358,7 +358,7 @@ public class JsonParser {
     parsedCharacterCount++;
 
     // Determine the character's class.
-    int nextClass;
+    byte nextClass;
     if (nextChar >= 128) {
         nextClass = C_ETC;
     } else {
@@ -370,7 +370,7 @@ public class JsonParser {
     }
 
     // Get the next state from the state transition table.
-    int nextState = state_transition_table[state][nextClass];
+    byte nextState = state_transition_table[(state << 5) + nextClass];
     if (nextState >= 0) {
       if (nextState >= ST && nextState <= E3) {
         if (state < ST || state > E3) {
