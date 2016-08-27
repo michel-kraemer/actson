@@ -512,7 +512,7 @@ public class JsonParser {
   private int stateToEvent() {
     if (state == IN || state == ZE) {
       return JsonEvent.VALUE_INT;
-    } else if (state == FR || state == E1 || state == E2 || state == E3) {
+    } else if (state >= FR && state <= E3) {
       return JsonEvent.VALUE_DOUBLE;
     } else if (state == T3) {
       return JsonEvent.VALUE_TRUE;
