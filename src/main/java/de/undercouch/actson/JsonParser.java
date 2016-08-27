@@ -204,7 +204,7 @@ public class JsonParser {
   /**
    * The current state
    */
-  private int state;
+  private byte state;
 
   /**
    * Collects all characters if the current state is ST (String),
