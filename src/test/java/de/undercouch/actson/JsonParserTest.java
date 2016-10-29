@@ -342,4 +342,14 @@ public class JsonParserTest {
     byte[] json = "{\"n\":-2.}".getBytes(StandardCharsets.UTF_8);
     parseFail(json, new JsonParser());
   }
+
+  /**
+   * Make sure '0e1' can be parsed
+   */
+  @Test
+  public void zeroWithExp() {
+    String json = "{\"n\":0e1}";
+    JsonParser parser = new JsonParser();
+    assertJsonObjectEquals(json, parse(json, parser));
+  }
 }
