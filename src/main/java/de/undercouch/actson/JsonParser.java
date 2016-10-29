@@ -122,20 +122,21 @@ public class JsonParser {
   private static final byte MI = 13;  // minus
   private static final byte ZE = 14;  // zero
   private static final byte IN = 15;  // integer
-  private static final byte FR = 16;  // fraction
-  private static final byte E1 = 17;  // e
-  private static final byte E2 = 18;  // ex
-  private static final byte E3 = 19;  // exp
-  private static final byte T1 = 20;  // tr
-  private static final byte T2 = 21;  // tru
-  private static final byte T3 = 22;  // true
-  private static final byte F1 = 23;  // fa
-  private static final byte F2 = 24;  // fal
-  private static final byte F3 = 25;  // fals
-  private static final byte F4 = 26;  // false
-  private static final byte N1 = 27;  // nu
-  private static final byte N2 = 28;  // nul
-  private static final byte N3 = 29;  // null
+  private static final byte F0 = 16;  // frac0
+  private static final byte FR = 17;  // fraction
+  private static final byte E1 = 18;  // e
+  private static final byte E2 = 19;  // ex
+  private static final byte E3 = 20;  // exp
+  private static final byte T1 = 21;  // tr
+  private static final byte T2 = 22;  // tru
+  private static final byte T3 = 23;  // true
+  private static final byte F1 = 24;  // fa
+  private static final byte F2 = 25;  // fal
+  private static final byte F3 = 26;  // fals
+  private static final byte F4 = 27;  // false
+  private static final byte N1 = 28;  // nu
+  private static final byte N2 = 29;  // nul
+  private static final byte N3 = 30;  // null
 
   /**
    * The state transition table takes the current state and the current symbol,
@@ -160,8 +161,9 @@ public class JsonParser {
   /*u3     U3*/  __,__,__,__,__,__,__,__,__,__,__,__,__,__,U4,U4,U4,U4,U4,U4,U4,U4,__,__,__,__,__,__,U4,U4,__,__,
   /*u4     U4*/  __,__,__,__,__,__,__,__,__,__,__,__,__,__,ST,ST,ST,ST,ST,ST,ST,ST,__,__,__,__,__,__,ST,ST,__,__,
   /*minus  MI*/  __,__,__,__,__,__,__,__,__,__,__,__,__,__,ZE,IN,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,
-  /*zero   ZE*/  OK,OK,__,-8,__,-7,__,-3,__,__,__,__,__,FR,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,
-  /*int    IN*/  OK,OK,__,-8,__,-7,__,-3,__,__,__,__,__,FR,IN,IN,__,__,__,__,E1,__,__,__,__,__,__,__,__,E1,__,__,
+  /*zero   ZE*/  OK,OK,__,-8,__,-7,__,-3,__,__,__,__,__,F0,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,
+  /*int    IN*/  OK,OK,__,-8,__,-7,__,-3,__,__,__,__,__,F0,IN,IN,__,__,__,__,E1,__,__,__,__,__,__,__,__,E1,__,__,
+  /*frac0  F0*/  __,__,__,__,__,__,__,__,__,__,__,__,__,__,FR,FR,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,
   /*frac   FR*/  OK,OK,__,-8,__,-7,__,-3,__,__,__,__,__,__,FR,FR,__,__,__,__,E1,__,__,__,__,__,__,__,__,E1,__,__,
   /*e      E1*/  __,__,__,__,__,__,__,__,__,__,__,E2,E2,__,E3,E3,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,
   /*ex     E2*/  __,__,__,__,__,__,__,__,__,__,__,__,__,__,E3,E3,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,

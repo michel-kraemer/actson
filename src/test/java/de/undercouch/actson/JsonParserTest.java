@@ -323,4 +323,23 @@ public class JsonParserTest {
     JsonParser parser = new JsonParser();
     assertJsonObjectEquals(json, parse(json, parser));
   }
+
+  /**
+   * Make sure a fraction can be parsed
+   */
+  @Test
+  public void fraction() {
+    String json = "{\"n\":2.1}";
+    JsonParser parser = new JsonParser();
+    assertJsonObjectEquals(json, parse(json, parser));
+  }
+
+  /**
+   * Test that the parser does not accept illegal numbers ending with a dot
+   */
+  @Test
+  public void illegalNumber() {
+    byte[] json = "{\"n\":-2.}".getBytes(StandardCharsets.UTF_8);
+    parseFail(json, new JsonParser());
+  }
 }
