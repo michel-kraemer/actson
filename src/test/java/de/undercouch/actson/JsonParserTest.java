@@ -313,4 +313,14 @@ public class JsonParserTest {
     assertJsonObjectEquals(json, parse(json, parser));
     assertEquals(JsonEvent.ERROR, parser.nextEvent());
   }
+
+  /**
+   * Make sure a number right before the end of the object can be parsed
+   */
+  @Test
+  public void numberAndEndOfObject() {
+    String json = "{\"n\":2}";
+    JsonParser parser = new JsonParser();
+    assertJsonObjectEquals(json, parse(json, parser));
+  }
 }

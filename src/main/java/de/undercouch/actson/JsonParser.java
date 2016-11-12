@@ -420,8 +420,13 @@ public class JsonParser {
         event1 = JsonEvent.ERROR;
         return;
       }
+      event1 = stateToEvent();
+      if (event1 == JsonEvent.NEED_MORE_INPUT) {
+        event1 = JsonEvent.END_OBJECT;
+      } else {
+        event2 = JsonEvent.END_OBJECT;
+      }
       state = OK;
-      event1 = JsonEvent.END_OBJECT;
       break;
 
     // ]
