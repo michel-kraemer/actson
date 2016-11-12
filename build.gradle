@@ -1,17 +1,11 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'org.standardout:gradle-eclipseconfig:1.0.0'
-    }
+plugins {
+    id "org.standardout.eclipseconfig" version "1.1.0"
 }
 
 apply plugin: 'jacoco'
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'maven'
-apply plugin: 'org.standardout.eclipseconfig'
 apply plugin: 'osgi'
 apply plugin: 'signing'
 
