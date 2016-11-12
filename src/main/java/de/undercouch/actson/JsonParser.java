@@ -147,7 +147,7 @@ public class JsonParser {
   private static byte[] state_transition_table = {
   /*               white                                      1-9                                   ABCDF  etc
                space |  {  }  [  ]  :  ,  "  \  /  +  -  .  0  |  a  b  c  d  e  f  l  n  r  s  t  u  |  E  | pad */
-  /*start  GO*/  GO,GO,-6,__,-5,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,
+  /*start  GO*/  GO,GO,-6,__,-5,__,__,__,ST,__,__,__,MI,__,ZE,IN,__,__,__,__,__,F1,__,N1,__,__,T1,__,__,__,__,__,
   /*ok     OK*/  OK,OK,__,-8,__,-7,__,-3,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,
   /*object OB*/  OB,OB,__,-9,__,__,__,__,ST,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,
   /*key    KE*/  KE,KE,__,__,__,__,__,__,ST,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,
@@ -322,6 +322,13 @@ public class JsonParser {
       while (event1 == JsonEvent.NEED_MORE_INPUT) {
         if (!feeder.hasInput()) {
           if (feeder.isDone()) {
+            if (state != OK) {
+              int r = stateToEvent();
+              if (r != JsonEvent.NEED_MORE_INPUT) {
+                state = OK;
+                return r;
+              }
+            }
             return (state == OK && pop(MODE_DONE) ? JsonEvent.EOF : JsonEvent.ERROR);
           }
           return JsonEvent.NEED_MORE_INPUT;
@@ -468,19 +475,12 @@ public class JsonParser {
 
     // "
     case -4:
-      switch (stack[top]) {
-      case MODE_KEY:
+      if (stack[top] == MODE_KEY) {
         state = CO;
         event1 = JsonEvent.FIELD_NAME;
-        break;
-      case MODE_ARRAY:
-      case MODE_OBJECT:
+      } else {
         state = OK;
         event1 = JsonEvent.VALUE_STRING;
-        break;
-      default:
-        event1 = JsonEvent.ERROR;
-        return;
       }
       break;
 

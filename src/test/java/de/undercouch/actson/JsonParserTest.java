@@ -167,7 +167,7 @@ public class JsonParserTest {
    */
   @Test
   public void testFail() throws IOException {
-    for (int i = 1; i <= 34; ++i) {
+    for (int i = 2; i <= 34; ++i) {
       URL u = getClass().getResource("fail" + i + ".txt");
       byte[] json = IOUtils.toByteArray(u);
       JsonParser parser = new JsonParser();
@@ -351,5 +351,54 @@ public class JsonParserTest {
     String json = "{\"n\":0e1}";
     JsonParser parser = new JsonParser();
     assertJsonObjectEquals(json, parse(json, parser));
+  }
+
+  /**
+   * Test if a top-level empty string can be parsed
+   */
+  @Test
+  public void topLevelEmptyString() {
+    String json = "\"\"";
+    JsonParser parser = new JsonParser();
+    assertEquals("\"\"", parse(json, parser));
+  }
+
+  /**
+   * Test if a top-level 'false' can be parsed
+   */
+  @Test
+  public void topLevelFalse() {
+    String json = "false";
+    JsonParser parser = new JsonParser();
+    assertEquals("false", parse(json, parser));
+  }
+
+  /**
+   * Test if a top-level integer can be parsed
+   */
+  @Test
+  public void topLevelInt() {
+    String json = "42";
+    JsonParser parser = new JsonParser();
+    assertEquals("42", parse(json, parser));
+  }
+
+  /**
+   * Make sure pre-mature end of file is detected correctly
+   */
+  @Test
+  public void numberAndEof() {
+    byte[] json = "{\"i\":42".getBytes(StandardCharsets.UTF_8);
+    parseFail(json, new JsonParser());
+  }
+
+  /**
+   * Test if a top-level zero can be parsed
+   */
+  @Test
+  public void topLevelZero() {
+    String json = "0";
+    JsonParser parser = new JsonParser();
+    assertEquals("0", parse(json, parser));
   }
 }
