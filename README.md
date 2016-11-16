@@ -1,4 +1,4 @@
-# Actson [![CircleCI](https://img.shields.io/circleci/project/michel-kraemer/actson.svg)](https://circleci.com/gh/michel-kraemer/actson) [![codecov](https://codecov.io/gh/michel-kraemer/actson/branch/master/graph/badge.svg)](https://codecov.io/gh/michel-kraemer/actson) [![Apache License, Version 2.0](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![Maven Central](https://img.shields.io/maven-central/v/de.undercouch/actson.svg)](http://search.maven.org/#artifactdetails%7Cde.undercouch%7Cactson%7C1.1.0%7Cjar) [![Javadoc](https://img.shields.io/badge/javadoc-v1.1.0-ff69b4.svg)](https://michel-kraemer.github.io/actson/javadoc/1.1.0/)
+# Actson [![CircleCI](https://img.shields.io/circleci/project/michel-kraemer/actson.svg)](https://circleci.com/gh/michel-kraemer/actson) [![codecov](https://codecov.io/gh/michel-kraemer/actson/branch/master/graph/badge.svg)](https://codecov.io/gh/michel-kraemer/actson) [![Apache License, Version 2.0](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![Maven Central](https://img.shields.io/maven-central/v/de.undercouch/actson.svg)](http://search.maven.org/#artifactdetails%7Cde.undercouch%7Cactson%7C1.2.0%7Cjar) [![Javadoc](https://img.shields.io/badge/javadoc-v1.2.0-ff69b4.svg)](https://michel-kraemer.github.io/actson/javadoc/1.2.0/)
 
 Actson is a reactive JSON parser (sometimes referred to as non-blocking or
 asynchronous). It is event-based and can be used together with reactive
@@ -94,7 +94,7 @@ Example for Maven:
     <dependency>
         <groupId>de.undercouch</groupId>
         <artifactId>actson</artifactId>
-        <version>1.1.0</version>
+        <version>1.2.0</version>
     </dependency>
 </dependencies>
 ```
@@ -103,7 +103,7 @@ Example for Gradle:
 
 ```gradle
 dependencies {
-    compile 'de.undercouch:actson:1.1.0'
+    compile 'de.undercouch:actson:1.2.0'
 }
 ```
 
