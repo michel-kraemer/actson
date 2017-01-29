@@ -24,6 +24,7 @@ tasks.withType(JavaCompile) {
 }
 
 dependencies {
+    testCompile 'com.fasterxml.jackson.core:jackson-core:2.8.4'
     testCompile 'com.fasterxml.jackson.core:jackson-databind:2.8.4'
     testCompile 'commons-io:commons-io:2.5'
     testCompile 'junit:junit:4.12'
