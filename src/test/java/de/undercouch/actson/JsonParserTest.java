@@ -180,17 +180,28 @@ public class JsonParserTest {
     assertJsonObjectEquals(json, parse(json));
   }
 
+  /**
+   * Test that single UTF code point escape is replaced with actual
+   * code point value in parsed string.
+   */
   @Test
   public void utf8Codepoint() {
     assertEquals("\"\u2615\"", parse("\"\\u2615\""));
   }
 
+  /**
+   * Test that single character escapes are replaced with their
+   * values in parsed string.
+   */
   @Test
   public void escapes() {
     assertEquals("\"\\\" \\\\%22\\\"\"", parse("\"\\u0022 \\\\%22\\\"\""));
     assertEquals("\"\\b\\f\\n\\r\\t/\\\\\"", parse("\"\\b\\f\\n\\r\\t\\/\\\\\""));
   }
 
+  /**
+   * Test that unknown escape symbol is rejected.
+   */
   @Test
   public void invalidEscape() {
     try {
@@ -200,7 +211,6 @@ public class JsonParserTest {
       // Expected
     }
   }
-
 
   /**
    * Test if an object with one property is parsed correctly

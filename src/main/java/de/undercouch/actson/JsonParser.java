@@ -406,8 +406,8 @@ public class JsonParser {
     } else if (nextState == XU) {
       // End of UTF code point escape
       currentValue.append(nextChar);
-      final int len = currentValue.length();
-      final int code = Integer.parseInt(currentValue.substring(len - 4, len), 16);
+      int len = currentValue.length();
+      int code = Integer.parseInt(currentValue.substring(len - 4, len), 16);
       currentValue.delete(len - 6, len).appendCodePoint(code);
       state = ST;
     } else if (nextState == XE) {
