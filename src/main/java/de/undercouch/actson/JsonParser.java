@@ -402,21 +402,11 @@ public class JsonParser {
         event1 = stateToEvent();
       }
 
+      // Change the state.
       state = nextState;
-    } else if (nextState == XU) {
-      // End of UTF code point escape
-      currentValue.append(nextChar);
-      int len = currentValue.length();
-      int code = Integer.parseInt(currentValue.substring(len - 4, len), 16);
-      currentValue.delete(len - 6, len).appendCodePoint(code);
-      state = ST;
-    } else if (nextState == XE) {
-      // End of single byte escape
-      currentValue.setCharAt(currentValue.length() - 1, singleEscapeChar(nextChar));
-      state = ST;
     } else {
       // Or perform one of the actions.
-      performAction(nextState);
+      performAction(nextState, nextChar);
     }
   }
 
@@ -440,7 +430,7 @@ public class JsonParser {
    * Perform an action that changes the parser state
    * @param action the action to perform
    */
-  private void performAction(byte action) {
+  private void performAction(byte action, char nextChar) {
     switch (action) {
     // empty }
     case -9:
@@ -543,6 +533,21 @@ public class JsonParser {
         return;
       }
       state = VA;
+      break;
+
+    // End of UTF code point escape
+    case XU:
+      currentValue.append(nextChar);
+      int len = currentValue.length();
+      int code = Integer.parseInt(currentValue.substring(len - 4, len), 16);
+      currentValue.delete(len - 6, len).appendCodePoint(code);
+      state = ST;
+      break;
+
+    // End of single byte escape
+    case XE:
+      currentValue.setCharAt(currentValue.length() - 1, singleEscapeChar(nextChar));
+      state = ST;
       break;
 
     // Bad action.
