@@ -138,6 +138,9 @@ public class JsonParser {
   private static final byte N2 = 29;  // nul
   private static final byte N3 = 30;  // null
 
+  private static final byte XE = -11; // action single byte escape
+  private static final byte XU = -10; // action unicode escape
+
   /**
    * The state transition table takes the current state and the current symbol,
    * and returns either a new state or an action. An action is represented as a
@@ -155,11 +158,11 @@ public class JsonParser {
   /*value  VA*/  VA,VA,-6,__,-5,__,__,__,ST,__,__,__,MI,__,ZE,IN,__,__,__,__,__,F1,__,N1,__,__,T1,__,__,__,__,__,
   /*array  AR*/  AR,AR,-6,__,-5,-7,__,__,ST,__,__,__,MI,__,ZE,IN,__,__,__,__,__,F1,__,N1,__,__,T1,__,__,__,__,__,
   /*string ST*/  ST,__,ST,ST,ST,ST,ST,ST,-4,ES,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,__,
-  /*escape ES*/  __,__,__,__,__,__,__,__,ST,ST,ST,__,__,__,__,__,__,ST,__,__,__,ST,__,ST,ST,__,ST,U1,__,__,__,__,
+  /*escape ES*/  __,__,__,__,__,__,__,__,XE,XE,XE,__,__,__,__,__,__,XE,__,__,__,XE,__,XE,XE,__,XE,U1,__,__,__,__,
   /*u1     U1*/  __,__,__,__,__,__,__,__,__,__,__,__,__,__,U2,U2,U2,U2,U2,U2,U2,U2,__,__,__,__,__,__,U2,U2,__,__,
   /*u2     U2*/  __,__,__,__,__,__,__,__,__,__,__,__,__,__,U3,U3,U3,U3,U3,U3,U3,U3,__,__,__,__,__,__,U3,U3,__,__,
   /*u3     U3*/  __,__,__,__,__,__,__,__,__,__,__,__,__,__,U4,U4,U4,U4,U4,U4,U4,U4,__,__,__,__,__,__,U4,U4,__,__,
-  /*u4     U4*/  __,__,__,__,__,__,__,__,__,__,__,__,__,__,ST,ST,ST,ST,ST,ST,ST,ST,__,__,__,__,__,__,ST,ST,__,__,
+  /*u4     U4*/  __,__,__,__,__,__,__,__,__,__,__,__,__,__,XU,XU,XU,XU,XU,XU,XU,XU,__,__,__,__,__,__,XU,XU,__,__,
   /*minus  MI*/  __,__,__,__,__,__,__,__,__,__,__,__,__,__,ZE,IN,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,
   /*zero   ZE*/  OK,OK,__,-8,__,-7,__,-3,__,__,__,__,__,F0,__,__,__,__,__,__,E1,__,__,__,__,__,__,__,__,E1,__,__,
   /*int    IN*/  OK,OK,__,-8,__,-7,__,-3,__,__,__,__,__,F0,IN,IN,__,__,__,__,E1,__,__,__,__,__,__,__,__,E1,__,__,
@@ -403,7 +406,23 @@ public class JsonParser {
       state = nextState;
     } else {
       // Or perform one of the actions.
-      performAction(nextState);
+      performAction(nextState, nextChar);
+    }
+  }
+
+  private char singleEscapeChar(char nextChar) {
+    switch (nextChar) {
+      case '"': return '"';
+      case '\\': return '\\';
+      case '/': return '/';
+      case 'b': return '\b';
+      case 'f': return '\f';
+      case 'n': return '\n';
+      case 'r': return '\r';
+      case 't': return '\t';
+      default:
+        // Transition table guarantees we'll never get here.
+        throw new IllegalStateException("Unexpected escape '" + nextChar + "'");
     }
   }
 
@@ -411,7 +430,7 @@ public class JsonParser {
    * Perform an action that changes the parser state
    * @param action the action to perform
    */
-  private void performAction(byte action) {
+  private void performAction(byte action, char nextChar) {
     switch (action) {
     // empty }
     case -9:
@@ -514,6 +533,21 @@ public class JsonParser {
         return;
       }
       state = VA;
+      break;
+
+    // End of UTF code point escape
+    case XU:
+      currentValue.append(nextChar);
+      int len = currentValue.length();
+      int code = Integer.parseInt(currentValue.substring(len - 4, len), 16);
+      currentValue.delete(len - 6, len).appendCodePoint(code);
+      state = ST;
+      break;
+
+    // End of single byte escape
+    case XE:
+      currentValue.setCharAt(currentValue.length() - 1, singleEscapeChar(nextChar));
+      state = ST;
       break;
 
     // Bad action.

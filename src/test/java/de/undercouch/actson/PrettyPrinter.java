@@ -43,7 +43,7 @@ public class PrettyPrinter {
    * @param args program arguments
    */
   public static void main(String[] args) {
-    byte[] json = "{\"name\":\"Elvis\"}".getBytes(StandardCharsets.UTF_8);
+    byte[] json =  "{\"name\":\"Elvis \\u266b\"}".getBytes(StandardCharsets.UTF_8);
 
     JsonParser parser = new JsonParser();
     PrettyPrinter prettyPrinter = new PrettyPrinter();

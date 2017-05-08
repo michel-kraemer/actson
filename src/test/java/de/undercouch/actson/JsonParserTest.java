@@ -25,13 +25,17 @@ package de.undercouch.actson;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
@@ -64,24 +68,11 @@ public class JsonParserTest {
    * @return the new JSON string
    */
   private String parse(String json, JsonParser parser) {
-    byte[] buf = json.getBytes(StandardCharsets.UTF_8);
-
-    PrettyPrinter printer = new PrettyPrinter();
-
-    int i = 0;
-    int event;
-    do {
-      while ((event = parser.nextEvent()) == JsonEvent.NEED_MORE_INPUT) {
-        i += parser.getFeeder().feed(buf, i, buf.length - i);
-        if (i == buf.length) {
-          parser.getFeeder().done();
-        }
-      }
-      assertFalse("Invalid JSON text", event == JsonEvent.ERROR);
-      printer.onEvent(event, parser);
-    } while (event != JsonEvent.EOF);
-
-    return printer.getResult();
+    final ByteArrayOutputStream out = new ByteArrayOutputStream();
+    final JsonGenerator generator = JsonHelper.defaultGenerator(new OutputStreamWriter(out));
+    JsonHelper.setPrettyPrint(generator);
+    JsonHelper.regenerateJson(json.getBytes(StandardCharsets.UTF_8), parser, generator);
+    return out.toString();
   }
 
   /**
@@ -187,6 +178,38 @@ public class JsonParserTest {
   public void emptyObject() {
     String json = "{}";
     assertJsonObjectEquals(json, parse(json));
+  }
+
+  /**
+   * Test that single UTF code point escape is replaced with actual
+   * code point value in parsed string.
+   */
+  @Test
+  public void utf8Codepoint() {
+    assertEquals("\"\u2615\"", parse("\"\\u2615\""));
+  }
+
+  /**
+   * Test that single character escapes are replaced with their
+   * values in parsed string.
+   */
+  @Test
+  public void escapes() {
+    assertEquals("\"\\\" \\\\%22\\\"\"", parse("\"\\u0022 \\\\%22\\\"\""));
+    assertEquals("\"\\b\\f\\n\\r\\t/\\\\\"", parse("\"\\b\\f\\n\\r\\t\\/\\\\\""));
+  }
+
+  /**
+   * Test that unknown escape symbol is rejected.
+   */
+  @Test
+  public void invalidEscape() {
+    try {
+      parse("\"\\z\"");
+      fail("The input should not be accepted.");
+    } catch (IllegalArgumentException e) {
+      // Expected
+    }
   }
 
   /**
