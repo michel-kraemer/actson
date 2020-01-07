@@ -27,11 +27,6 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
-// initialize gradle wrapper
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.14.1'
-}
-
 // package javadoc into a jar file
 task packageJavadoc(type: Jar, dependsOn: 'javadoc') {
     from javadoc.destinationDir
