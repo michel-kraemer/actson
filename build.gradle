@@ -1,6 +1,5 @@
 plugins {
-    id "org.standardout.eclipseconfig" version "1.1.0"
-    id "com.github.ben-manes.versions" version "0.13.0"
+    id "com.github.ben-manes.versions" version "0.27.0"
 }
 
 apply plugin: 'jacoco'
@@ -22,9 +21,9 @@ tasks.withType(JavaCompile) {
 }
 
 dependencies {
-    testCompile 'com.fasterxml.jackson.core:jackson-databind:2.8.4'
-    testCompile 'commons-io:commons-io:2.5'
-    testCompile 'junit:junit:4.12'
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.10.2'
+    testImplementation 'commons-io:commons-io:2.6'
+    testImplementation 'junit:junit:4.13'
 }
 
 // package javadoc into a jar file
