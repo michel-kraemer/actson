@@ -57,6 +57,11 @@ jacocoTestReport {
 
 check.dependsOn jacocoTestReport
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
