@@ -279,31 +279,31 @@ public class JsonParserTest {
     parser.getFeeder().feed(json);
     parser.getFeeder().done();
 
-    assertEquals(0, parser.getParsedCharacterCount());
+    assertEquals(0L, parser.getParsedCharacterCount());
 
     assertEquals(JsonEvent.START_OBJECT, parser.nextEvent());
-    assertEquals(1, parser.getParsedCharacterCount());
-    assertEquals('{', jsonStr.charAt(parser.getParsedCharacterCount() - 1));
+    assertEquals(1L, parser.getParsedCharacterCount());
+    assertEquals('{', jsonStr.charAt((int)parser.getParsedCharacterCount() - 1));
 
     assertEquals(JsonEvent.FIELD_NAME, parser.nextEvent());
-    assertEquals(7, parser.getParsedCharacterCount());
+    assertEquals(7L, parser.getParsedCharacterCount());
     assertEquals("\"name\"", jsonStr.substring(
-        parser.getParsedCharacterCount() - 6,
-        parser.getParsedCharacterCount()));
+        (int)parser.getParsedCharacterCount() - 6,
+        (int)parser.getParsedCharacterCount()));
 
     assertEquals(JsonEvent.VALUE_STRING, parser.nextEvent());
-    assertEquals(16, parser.getParsedCharacterCount());
+    assertEquals(16L, parser.getParsedCharacterCount());
     assertEquals("\"Bj\u0153rn\"", jsonStr.substring(
-        parser.getParsedCharacterCount() - 7,
-        parser.getParsedCharacterCount()));
+        (int)parser.getParsedCharacterCount() - 7,
+        (int)parser.getParsedCharacterCount()));
 
     assertEquals(JsonEvent.END_OBJECT, parser.nextEvent());
-    assertEquals(17, parser.getParsedCharacterCount());
-    assertEquals('}', jsonStr.charAt(parser.getParsedCharacterCount() - 1));
+    assertEquals(17L, parser.getParsedCharacterCount());
+    assertEquals('}', jsonStr.charAt((int)parser.getParsedCharacterCount() - 1));
 
     assertEquals(JsonEvent.EOF, parser.nextEvent());
-    assertEquals(17, parser.getParsedCharacterCount());
-    assertEquals('}', jsonStr.charAt(parser.getParsedCharacterCount() - 1));
+    assertEquals(17L, parser.getParsedCharacterCount());
+    assertEquals('}', jsonStr.charAt((int)parser.getParsedCharacterCount() - 1));
   }
 
   /**

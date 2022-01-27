@@ -216,9 +216,9 @@ public class JsonParser {
 
   /**
    * The number of characters processed by the JSON parser
-   * @since 1.1.0
+   * @since 2.0.0
    */
-  private int parsedCharacterCount = 0;
+  private long parsedCharacterCount = 0L;
 
   /**
    * The feeder is used to get input to parse
@@ -591,9 +591,9 @@ public class JsonParser {
    * name is 4 characters long (including the quotes) and the parser has
    * already processed all characters of it.</p>
    * @return the character offset
-   * @since 1.1.0
+   * @since 2.0.0
    */
-  public int getParsedCharacterCount() {
+  public long getParsedCharacterCount() {
     return parsedCharacterCount;
   }
 }
