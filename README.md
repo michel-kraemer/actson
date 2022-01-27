@@ -5,7 +5,7 @@ asynchronous). It is event-based and can be used together with reactive
 libraries/tool-kits such as [RxJava](https://github.com/ReactiveX/RxJava) or
 [Vert.x](http://vertx.io).
 
-The library is very small and has no dependencies. It only requires Java 7
+The library is very small and has no dependencies. It only requires Java 8
 (or higher).
 
 ## Why another JSON parser?
