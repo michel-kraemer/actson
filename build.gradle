@@ -13,6 +13,7 @@ sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
+ext.junitVersion = "5.8.2"
 
 repositories {
     jcenter()
@@ -25,7 +26,10 @@ tasks.withType(JavaCompile) {
 dependencies {
     testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
     testImplementation 'commons-io:commons-io:2.11.0'
-    testImplementation 'junit:junit:4.13'
+    testImplementation("org.assertj:assertj-core:3.22.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:$junitVersion")
 }
 
 // package javadoc into a jar file
@@ -38,6 +42,10 @@ task packageJavadoc(type: Jar, dependsOn: 'javadoc') {
 task packageSources(type: Jar) {
     from sourceSets.main.allSource
     classifier = 'sources'
+}
+
+test {
+    useJUnitPlatform()
 }
 
 jacocoTestReport {

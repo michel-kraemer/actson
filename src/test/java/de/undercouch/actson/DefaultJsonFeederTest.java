@@ -23,10 +23,7 @@
 
 package de.undercouch.actson;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.junit.jupiter.api.Test;
 
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
@@ -34,7 +31,8 @@ import java.nio.charset.MalformedInputException;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnmappableCharacterException;
 
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Tests {@link DefaultJsonFeeder}
@@ -50,9 +48,9 @@ public class DefaultJsonFeederTest {
    */
   @Test
   public void emptyAtBeginning() throws CharacterCodingException {
-    assertFalse(feeder.hasInput());
-    assertFalse(feeder.isFull());
-    assertFalse(feeder.isDone());
+    assertThat(feeder.hasInput()).isFalse();
+    assertThat(feeder.isFull()).isFalse();
+    assertThat(feeder.isDone()).isFalse();
   }
 
   /**
@@ -62,7 +60,7 @@ public class DefaultJsonFeederTest {
   @Test
   public void hasInput() throws CharacterCodingException {
     feeder.feed((byte)'a');
-    assertTrue(feeder.hasInput());
+    assertThat(feeder.hasInput()).isTrue();
   }
 
   /**
@@ -71,10 +69,10 @@ public class DefaultJsonFeederTest {
   @Test
   public void isFull() {
     for (int i = 0; i < 16; ++i) {
-      assertFalse(feeder.isFull());
+      assertThat(feeder.isFull()).isFalse();
       feeder.feed((byte)('a' + i));
     }
-    assertTrue(feeder.isFull());
+    assertThat(feeder.isFull()).isTrue();
   }
 
   /**
@@ -85,29 +83,29 @@ public class DefaultJsonFeederTest {
   public void feedBuf() throws CharacterCodingException {
     byte[] buf = "abcd".getBytes(StandardCharsets.UTF_8);
 
-    assertFalse(feeder.isFull());
-    assertFalse(feeder.hasInput());
+    assertThat(feeder.isFull()).isFalse();
+    assertThat(feeder.hasInput()).isFalse();
 
     feeder.feed(buf);
 
-    assertFalse(feeder.isFull());
-    assertTrue(feeder.hasInput());
+    assertThat(feeder.isFull()).isFalse();
+    assertThat(feeder.hasInput()).isTrue();
 
-    assertEquals('a', feeder.nextInput());
-    assertEquals('b', feeder.nextInput());
-    assertEquals('c', feeder.nextInput());
-    assertEquals('d', feeder.nextInput());
-    assertFalse(feeder.isFull());
-    assertFalse(feeder.hasInput());
+    assertThat(feeder.nextInput()).isEqualTo('a');
+    assertThat(feeder.nextInput()).isEqualTo('b');
+    assertThat(feeder.nextInput()).isEqualTo('c');
+    assertThat(feeder.nextInput()).isEqualTo('d');
+    assertThat(feeder.isFull()).isFalse();
+    assertThat(feeder.hasInput()).isFalse();
 
     feeder.feed(buf);
-    assertFalse(feeder.isFull());
+    assertThat(feeder.isFull()).isFalse();
     feeder.feed(buf);
-    assertFalse(feeder.isFull());
+    assertThat(feeder.isFull()).isFalse();
     feeder.feed(buf);
-    assertFalse(feeder.isFull());
+    assertThat(feeder.isFull()).isFalse();
     feeder.feed(buf);
-    assertTrue(feeder.isFull());
+    assertThat(feeder.isFull()).isTrue();
   }
 
   /**
@@ -121,13 +119,13 @@ public class DefaultJsonFeederTest {
 
     feeder.feed(buf, 22, 4);
 
-    assertFalse(feeder.isFull());
-    assertEquals('a', feeder.nextInput());
-    assertEquals('b', feeder.nextInput());
-    assertEquals('c', feeder.nextInput());
-    assertEquals('d', feeder.nextInput());
-    assertFalse(feeder.isFull());
-    assertFalse(feeder.hasInput());
+    assertThat(feeder.isFull()).isFalse();
+    assertThat(feeder.nextInput()).isEqualTo('a');
+    assertThat(feeder.nextInput()).isEqualTo('b');
+    assertThat(feeder.nextInput()).isEqualTo('c');
+    assertThat(feeder.nextInput()).isEqualTo('d');
+    assertThat(feeder.isFull()).isFalse();
+    assertThat(feeder.hasInput()).isFalse();
   }
 
   /**
@@ -136,23 +134,25 @@ public class DefaultJsonFeederTest {
    */
   @Test
   public void isDone() throws CharacterCodingException {
-    assertFalse(feeder.isDone());
+    assertThat(feeder.isDone()).isFalse();
     feeder.feed((byte)'a');
-    assertFalse(feeder.isDone());
+    assertThat(feeder.isDone()).isFalse();
     feeder.done();
-    assertFalse(feeder.isDone());
+    assertThat(feeder.isDone()).isFalse();
     feeder.nextInput();
-    assertTrue(feeder.isDone());
+    assertThat(feeder.isDone()).isTrue();
   }
 
   /**
    * Test if the feeder throws an exception if it is full
    */
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void tooFull() {
-    for (int i = 0; i < 17; ++i) {
-      feeder.feed((byte)('a' + i));
-    }
+    assertThatThrownBy(() -> {
+      for (int i = 0; i < 17; ++i) {
+        feeder.feed((byte)('a' + i));
+      }
+    }).isInstanceOf(IllegalStateException.class);
   }
 
   /**
@@ -170,13 +170,13 @@ public class DefaultJsonFeederTest {
         ++i;
       }
       while (feeder.hasInput()) {
-        assertEquals(expected.charAt(j), feeder.nextInput());
+        assertThat(feeder.nextInput()).isEqualTo(expected.charAt(j));
         ++j;
       }
     }
-    assertEquals(expected.length(), j);
-    assertFalse(feeder.hasInput());
-    assertFalse(feeder.isFull());
+    assertThat(j).isEqualTo(expected.length());
+    assertThat(feeder.hasInput()).isFalse();
+    assertThat(feeder.isFull()).isFalse();
   }
 
   /**
@@ -278,58 +278,48 @@ public class DefaultJsonFeederTest {
    */
   @Test
   public void partialUnicode() throws CharacterCodingException {
-    assertFalse(feeder.hasInput());
-    try {
-      feeder.nextInput();
-      fail();
-    } catch (IllegalStateException e) {
-      // OK
-    }
+    assertThat(feeder.hasInput()).isFalse();
+    assertThatThrownBy(feeder::nextInput).isInstanceOf(IllegalStateException.class);
 
     // first part of a UTF-8 character
     feeder.feed((byte)197);
-    assertFalse(feeder.hasInput());
-    try {
-      feeder.nextInput();
-      fail();
-    } catch (IllegalStateException e) {
-      // OK
-    }
+    assertThat(feeder.hasInput()).isFalse();
+    assertThatThrownBy(feeder::nextInput).isInstanceOf(IllegalStateException.class);
 
     // second part of a UTF-8 character
     feeder.feed((byte)147);
-    assertTrue(feeder.hasInput());
+    assertThat(feeder.hasInput()).isTrue();
 
     // '\u0153' == [ (byte)197, (byte)147 ]
     char c = feeder.nextInput();
-    assertEquals('\u0153', c);
-    assertFalse(feeder.hasInput());
+    assertThat(c).isEqualTo('\u0153');
+    assertThat(feeder.hasInput()).isFalse();
   }
 
   /**
    * Tests if the feeder throws an exception if the input is malformed
-   * @throws CharacterCodingException if the test is successful
    */
-  @Test(expected = MalformedInputException.class)
-  public void malformedInput() throws CharacterCodingException {
+  @Test
+  public void malformedInput() {
     feeder.feed((byte)0xff);
     feeder.feed((byte)0xff);
-    feeder.nextInput();
+    assertThatThrownBy(feeder::nextInput).isInstanceOf(MalformedInputException.class);
   }
 
   /**
    * Tests if the feeder throws an exception if one of the output characters
    * is unmappable
-   * @throws CharacterCodingException if the test is successful
    */
-  @Test(expected = UnmappableCharacterException.class)
-  public void unmappableCharacter() throws CharacterCodingException {
+  @Test
+  public void unmappableCharacter() {
     DefaultJsonFeeder feeder = new DefaultJsonFeeder(
         Charset.forName("IBM1098"));
     feeder.feed((byte)0x80);
     feeder.feed((byte)0x81);
-    while (feeder.hasInput()) {
-      System.out.println(feeder.nextInput());
-    }
+    assertThatThrownBy(() -> {
+      while (feeder.hasInput()) {
+        System.out.println(feeder.nextInput());
+      }
+    }).isInstanceOf(UnmappableCharacterException.class);
   }
 }

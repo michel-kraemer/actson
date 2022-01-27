@@ -23,9 +23,10 @@
 
 package de.undercouch.actson;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URL;
@@ -33,11 +34,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
-import org.junit.Test;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests {@link JsonParser}
@@ -78,7 +75,7 @@ public class JsonParserTest {
           parser.getFeeder().done();
         }
       }
-      assertNotEquals("Invalid JSON text", JsonEvent.ERROR, event);
+      assertThat(event).isNotEqualTo(JsonEvent.ERROR);
       printer.onEvent(event, parser);
     } while (event != JsonEvent.EOF);
 
@@ -107,7 +104,7 @@ public class JsonParserTest {
       }
       ok = (event != JsonEvent.ERROR);
     } while (ok && event != JsonEvent.EOF);
-    assertFalse(ok);
+    assertThat(ok).isFalse();
   }
 
   /**
@@ -122,7 +119,7 @@ public class JsonParserTest {
     try {
       Map<String, Object> em = mapper.readValue(expected, ref);
       Map<String, Object> am = mapper.readValue(actual, ref);
-      assertEquals(em, am);
+      assertThat(am).isEqualTo(em);
     } catch (IOException e) {
       throw new IllegalStateException(e);
     }
@@ -139,7 +136,7 @@ public class JsonParserTest {
     try {
       List<Object> el = mapper.readValue(expected, ref);
       List<Object> al = mapper.readValue(actual, ref);
-      assertEquals(el, al);
+      assertThat(al).isEqualTo(el);
     } catch (IOException e) {
       throw new IllegalStateException(e);
     }
@@ -177,7 +174,7 @@ public class JsonParserTest {
 
       // test for too many nested modes
       parser.setMaxDepth(16);
-      assertEquals(16, parser.getMaxDepth());
+      assertThat(parser.getMaxDepth()).isEqualTo(16);
 
       parseFail(json, parser);
     }
@@ -279,31 +276,29 @@ public class JsonParserTest {
     parser.getFeeder().feed(json);
     parser.getFeeder().done();
 
-    assertEquals(0L, parser.getParsedCharacterCount());
+    assertThat(parser.getParsedCharacterCount()).isEqualTo(0L);
 
-    assertEquals(JsonEvent.START_OBJECT, parser.nextEvent());
-    assertEquals(1L, parser.getParsedCharacterCount());
-    assertEquals('{', jsonStr.charAt((int)parser.getParsedCharacterCount() - 1));
+    assertThat(parser.nextEvent()).isEqualTo(JsonEvent.START_OBJECT);
+    assertThat(parser.getParsedCharacterCount()).isEqualTo(1L);
+    assertThat(jsonStr.charAt((int)parser.getParsedCharacterCount() - 1)).isEqualTo('{');
 
-    assertEquals(JsonEvent.FIELD_NAME, parser.nextEvent());
-    assertEquals(7L, parser.getParsedCharacterCount());
-    assertEquals("\"name\"", jsonStr.substring(
-        (int)parser.getParsedCharacterCount() - 6,
-        (int)parser.getParsedCharacterCount()));
+    assertThat(parser.nextEvent()).isEqualTo(JsonEvent.FIELD_NAME);
+    assertThat(parser.getParsedCharacterCount()).isEqualTo(7L);
+    assertThat(jsonStr.substring((int)parser.getParsedCharacterCount() - 6,
+        (int)parser.getParsedCharacterCount())).isEqualTo("\"name\"");
 
-    assertEquals(JsonEvent.VALUE_STRING, parser.nextEvent());
-    assertEquals(16L, parser.getParsedCharacterCount());
-    assertEquals("\"Bj\u0153rn\"", jsonStr.substring(
-        (int)parser.getParsedCharacterCount() - 7,
-        (int)parser.getParsedCharacterCount()));
+    assertThat(JsonEvent.VALUE_STRING).isEqualTo(parser.nextEvent());
+    assertThat(parser.getParsedCharacterCount()).isEqualTo(16L);
+    assertThat(jsonStr.substring((int)parser.getParsedCharacterCount() - 7,
+        (int)parser.getParsedCharacterCount())).isEqualTo("\"Bj\u0153rn\"");
 
-    assertEquals(JsonEvent.END_OBJECT, parser.nextEvent());
-    assertEquals(17L, parser.getParsedCharacterCount());
-    assertEquals('}', jsonStr.charAt((int)parser.getParsedCharacterCount() - 1));
+    assertThat(parser.nextEvent()).isEqualTo(JsonEvent.END_OBJECT);
+    assertThat(parser.getParsedCharacterCount()).isEqualTo(17L);
+    assertThat(jsonStr.charAt((int)parser.getParsedCharacterCount() - 1)).isEqualTo('}');
 
-    assertEquals(JsonEvent.EOF, parser.nextEvent());
-    assertEquals(17L, parser.getParsedCharacterCount());
-    assertEquals('}', jsonStr.charAt((int)parser.getParsedCharacterCount() - 1));
+    assertThat(parser.nextEvent()).isEqualTo(JsonEvent.EOF);
+    assertThat(parser.getParsedCharacterCount()).isEqualTo(17L);
+    assertThat(jsonStr.charAt((int)parser.getParsedCharacterCount() - 1)).isEqualTo('}');
   }
 
   /**
@@ -314,7 +309,7 @@ public class JsonParserTest {
     String json = "{}";
     JsonParser parser = new JsonParser();
     assertJsonObjectEquals(json, parse(json, parser));
-    assertEquals(JsonEvent.ERROR, parser.nextEvent());
+    assertThat(parser.nextEvent()).isEqualTo(JsonEvent.ERROR);
   }
 
   /**
@@ -363,7 +358,7 @@ public class JsonParserTest {
   public void topLevelEmptyString() {
     String json = "\"\"";
     JsonParser parser = new JsonParser();
-    assertEquals("\"\"", parse(json, parser));
+    assertThat(parse(json, parser)).isEqualTo(json);
   }
 
   /**
@@ -373,7 +368,7 @@ public class JsonParserTest {
   public void topLevelFalse() {
     String json = "false";
     JsonParser parser = new JsonParser();
-    assertEquals("false", parse(json, parser));
+    assertThat(parse(json, parser)).isEqualTo(json);
   }
 
   /**
@@ -383,7 +378,17 @@ public class JsonParserTest {
   public void topLevelInt() {
     String json = "42";
     JsonParser parser = new JsonParser();
-    assertEquals("42", parse(json, parser));
+    assertThat(parse(json, parser)).isEqualTo(json);
+  }
+
+  /**
+   * Test if a top-level long can be parsed
+   */
+  @Test
+  public void topLevelLong() {
+    String json = "42123123123";
+    JsonParser parser = new JsonParser();
+    assertThat(parse(json, parser)).isEqualTo(json);
   }
 
   /**
@@ -402,6 +407,6 @@ public class JsonParserTest {
   public void topLevelZero() {
     String json = "0";
     JsonParser parser = new JsonParser();
-    assertEquals("0", parse(json, parser));
+    assertThat(parse(json, parser)).isEqualTo(json);
   }
 }
