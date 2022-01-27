@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2016 Michel Kraemer
+// Copyright (c) 2016-2022 Michel Kraemer
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -26,9 +26,6 @@ package de.undercouch.actson;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.Deque;
-
-import de.undercouch.actson.JsonEvent;
-import de.undercouch.actson.JsonParser;
 
 /**
  * Demonstrates how you can use the {@link JsonParser} to pretty-print
@@ -67,13 +64,13 @@ public class PrettyPrinter {
     // }
   }
 
-  private static enum Type {
+  private enum Type {
     OBJECT, ARRAY
   }
 
-  private StringBuilder result = new StringBuilder();
-  private Deque<Type> types = new ArrayDeque<>();
-  private Deque<Integer> elementCounts = new ArrayDeque<>();
+  private final StringBuilder result = new StringBuilder();
+  private final Deque<Type> types = new ArrayDeque<>();
+  private final Deque<Integer> elementCounts = new ArrayDeque<>();
   private int level;
 
   private void indent() {
@@ -123,7 +120,7 @@ public class PrettyPrinter {
       result.append(",\n");
       indent();
     }
-    result.append("\"" + name + "\": ");
+    result.append("\"").append(name).append("\": ");
     elementCounts.push(elementCounts.pop() + 1);
   }
 
@@ -138,7 +135,7 @@ public class PrettyPrinter {
 
   private void onValue(String value) {
     onValue();
-    result.append("\"" + value + "\"");
+    result.append("\"").append(value).append("\"");
   }
 
   private void onValue(int value) {

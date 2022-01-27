@@ -144,7 +144,7 @@ public class JsonParser {
    * negative number. A JSON text is accepted if at the end of the text the
    * state is OK and if the mode is MODE_DONE.
    */
-  private static byte[] state_transition_table = {
+  private static final byte[] state_transition_table = {
   /*               white                                      1-9                                   ABCDF  etc
                space |  {  }  [  ]  :  ,  "  \  /  +  -  .  0  |  a  b  c  d  e  f  l  n  r  s  t  u  |  E  | pad */
   /*start  GO*/  GO,GO,-6,__,-5,__,__,__,ST,__,__,__,MI,__,ZE,IN,__,__,__,__,__,F1,__,N1,__,__,T1,__,__,__,__,__,
@@ -212,7 +212,7 @@ public class JsonParser {
    * Collects all characters if the current state is ST (String),
    * IN (Integer), FR (Fraction) or the like
    */
-  private StringBuilder currentValue = new StringBuilder(128);
+  private final StringBuilder currentValue = new StringBuilder(128);
 
   /**
    * The number of characters processed by the JSON parser
@@ -287,7 +287,6 @@ public class JsonParser {
    */
   public JsonParser(JsonFeeder feeder) {
     stack = new byte[16];
-    top = -1;
     state = GO;
     push(MODE_DONE);
     this.feeder = feeder;
@@ -519,7 +518,7 @@ public class JsonParser {
     // Bad action.
     default:
       event1 = JsonEvent.ERROR;
-      return;
+      break;
     }
   }
 

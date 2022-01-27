@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2016 Michel Kraemer
+// Copyright (c) 2016-2022 Michel Kraemer
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -41,7 +41,7 @@ import org.junit.Test;
  * @author Michel Kraemer
  */
 public class DefaultJsonFeederTest {
-  private DefaultJsonFeeder feeder = new DefaultJsonFeeder(
+  private final DefaultJsonFeeder feeder = new DefaultJsonFeeder(
       StandardCharsets.UTF_8, 16);
 
   /**

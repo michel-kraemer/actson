@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2016 Michel Kraemer
+// Copyright (c) 2016-2022 Michel Kraemer
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -25,6 +25,7 @@ package de.undercouch.actson;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 
 import java.io.IOException;
 import java.net.URL;
@@ -77,7 +78,7 @@ public class JsonParserTest {
           parser.getFeeder().done();
         }
       }
-      assertFalse("Invalid JSON text", event == JsonEvent.ERROR);
+      assertNotEquals("Invalid JSON text", JsonEvent.ERROR, event);
       printer.onEvent(event, parser);
     } while (event != JsonEvent.EOF);
 
@@ -91,7 +92,7 @@ public class JsonParserTest {
    * @param parser the parser to use
    */
   private void parseFail(byte[] json, JsonParser parser) {
-    boolean ok = true;
+    boolean ok;
     int j = 0;
     int event;
     do {
@@ -104,7 +105,7 @@ public class JsonParserTest {
           parser.getFeeder().done();
         }
       }
-      ok &= (event != JsonEvent.ERROR);
+      ok = (event != JsonEvent.ERROR);
     } while (ok && event != JsonEvent.EOF);
     assertFalse(ok);
   }
@@ -152,7 +153,8 @@ public class JsonParserTest {
   public void testPass() throws IOException {
     for (int i = 1; i <= 3; ++i) {
       URL u = getClass().getResource("pass" + i + ".txt");
-      String json = IOUtils.toString(u, "UTF-8");
+      assert u != null;
+      String json = IOUtils.toString(u, StandardCharsets.UTF_8);
       if (json.startsWith("{")) {
         assertJsonObjectEquals(json, parse(json));
       } else {
@@ -169,6 +171,7 @@ public class JsonParserTest {
   public void testFail() throws IOException {
     for (int i = 2; i <= 34; ++i) {
       URL u = getClass().getResource("fail" + i + ".txt");
+      assert u != null;
       byte[] json = IOUtils.toByteArray(u);
       JsonParser parser = new JsonParser();
 
