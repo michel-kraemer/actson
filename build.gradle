@@ -1,7 +1,3 @@
-plugins {
-    id "com.github.ben-manes.versions" version "0.27.0"
-}
-
 apply plugin: 'jacoco'
 apply plugin: 'java'
 apply plugin: 'maven'
@@ -16,8 +12,8 @@ repositories {
     jcenter()
 }
 
-tasks.withType(JavaCompile) { 
-    options.compilerArgs << "-Xlint" 
+tasks.withType(JavaCompile) {
+    options.compilerArgs << "-Xlint"
 }
 
 dependencies {
@@ -69,7 +65,7 @@ uploadArchives {
         mavenDeployer {
             // sign artifacts before upload
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-            
+
             // upload to sonatype OSS
             repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
                 authentication(userName: this.hasProperty('sonatypeUsername') ? sonatypeUsername : '',
@@ -79,20 +75,20 @@ uploadArchives {
                 authentication(userName: this.hasProperty('sonatypeUsername') ? sonatypeUsername : '',
                     password: this.hasProperty('sonatypePassword') ? sonatypePassword : '')
             }
-            
+
             // pom file details
             pom.project {
                name 'actson'
                packaging 'jar'
                description 'A reactive (non-blocking, asynchronous) JSON parser.'
                url 'https://michelkraemer.com'
- 
+
                scm {
                    url 'scm:git:git://github.com/michel-kraemer/actson.git'
                    connection 'scm:git:git://github.com/michel-kraemer/actson.git'
                    developerConnection 'scm:git:git://github.com/michel-kraemer/actson.git'
                }
- 
+
                licenses {
                    license {
                        name 'The Apache Software License, Version 2.0'
@@ -100,7 +96,7 @@ uploadArchives {
                        distribution 'repo'
                    }
                }
- 
+
                developers {
                    developer {
                        id 'michel-kraemer'

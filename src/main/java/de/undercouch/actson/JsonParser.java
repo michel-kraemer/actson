@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2016 Michel Kraemer
+// Copyright (c) 2016-2022 Michel Kraemer
 // Copyright (c) 2005 JSON.org
 //
 // Permission is hereby granted, free of charge, to any person obtaining
