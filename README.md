@@ -94,7 +94,7 @@ Example for Maven:
     <dependency>
         <groupId>de.undercouch</groupId>
         <artifactId>actson</artifactId>
-        <version>1.2.0</version>
+        <version>2.0.0</version>
     </dependency>
 </dependencies>
 ```
@@ -103,7 +103,7 @@ Example for Gradle:
 
 ```gradle
 dependencies {
-    compile 'de.undercouch:actson:1.2.0'
+    compile 'de.undercouch:actson:2.0.0'
 }
 ```
 
@@ -122,30 +122,10 @@ may create a .jar library:
 
 The library will be located under the `build/libs` directory.
 
-### Eclipse
-
-Gradle includes a task that creates all files required to develop
-Actson in Eclipse. Run the following command:
-
-    ./gradlew eclipse
-
-Then import the project into your workspace.
-
-### IntelliJ
-
-Gradle includes a task that creates all files required to develop
-Actson in IntelliJ. Run the following command:
-
-    ./gradlew idea
-
-Then import the project into your workspace or open the root `actson.ipr`
-project file.
-
 ## Similar libraries
 
 * [Jackson](https://github.com/FasterXML/jackson) has a streaming API that
-  produces JSON tokens/events. However, it uses blocking I/O because it reads
-  from an `InputStream`.
+  produces JSON tokens/events.
 * [Aalto XML](https://github.com/FasterXML/aalto-xml) is similar to Actson
   but parses XML instead of JSON.
 
