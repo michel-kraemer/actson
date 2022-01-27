@@ -1,12 +1,18 @@
+plugins {
+    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
+}
+
 apply plugin: 'jacoco'
 apply plugin: 'java'
-apply plugin: 'maven'
+apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
 version = '2.0.0-SNAPSHOT'
 group = 'de.undercouch'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
+
+ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 repositories {
     jcenter()
@@ -43,68 +49,57 @@ jacocoTestReport {
 
 check.dependsOn jacocoTestReport
 
-// define artifacts for upload
-artifacts {
-    archives jar
-    archives packageJavadoc
-    archives packageSources
-}
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
 
-// sign all artifacts
-signing {
-    required { gradle.taskGraph.hasTask(uploadArchives) }
-    sign configurations.archives
-}
-
-// remove test dependencies from configuration-to-scope mapping
-// this also removes them from the maven pom file
-conf2ScopeMappings.mappings.remove(configurations.testCompile)
-
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            // sign artifacts before upload
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-            // upload to sonatype OSS
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
-                authentication(userName: this.hasProperty('sonatypeUsername') ? sonatypeUsername : '',
-                    password: this.hasProperty('sonatypePassword') ? sonatypePassword : '')
-            }
-            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
-                authentication(userName: this.hasProperty('sonatypeUsername') ? sonatypeUsername : '',
-                    password: this.hasProperty('sonatypePassword') ? sonatypePassword : '')
-            }
-
-            // pom file details
-            pom.project {
-               name 'actson'
-               packaging 'jar'
-               description 'A reactive (non-blocking, asynchronous) JSON parser.'
-               url 'https://michelkraemer.com'
+            pom {
+               name = 'actson'
+               packaging = 'jar'
+               description = 'A reactive (non-blocking, asynchronous) JSON parser.'
+               url = 'https://michelkraemer.com'
 
                scm {
-                   url 'scm:git:git://github.com/michel-kraemer/actson.git'
-                   connection 'scm:git:git://github.com/michel-kraemer/actson.git'
-                   developerConnection 'scm:git:git://github.com/michel-kraemer/actson.git'
+                   url = 'scm:git:git://github.com/michel-kraemer/actson.git'
+                   connection = 'scm:git:git://github.com/michel-kraemer/actson.git'
+                   developerConnection = 'scm:git:git://github.com/michel-kraemer/actson.git'
                }
 
                licenses {
                    license {
-                       name 'The Apache Software License, Version 2.0'
-                       url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                       distribution 'repo'
+                       name = 'The MIT License'
+                       url = 'https://opensource.org/licenses/MIT'
+                       distribution = 'repo'
                    }
                }
 
                developers {
                    developer {
-                       id 'michel-kraemer'
-                       name 'Michel Kraemer'
-                       email 'michel@undercouch.de'
+                       id = 'michel-kraemer'
+                       name = 'Michel Kraemer'
+                       email = 'michel@undercouch.de'
+                       url = 'https://michelkraemer.com'
                    }
                }
            }
         }
+    }
+}
+
+// sign all artifacts
+signing {
+    useGpgCmd()
+    sign publishing.publications.mavenJava
+}
+
+tasks.withType(Sign) {
+    // only sign release artifacts and not snapshots
+    onlyIf { isReleaseVersion }
+}
+
+nexusPublishing {
+    repositories {
+        sonatype()
     }
 }
