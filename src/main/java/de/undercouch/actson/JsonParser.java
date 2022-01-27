@@ -562,6 +562,15 @@ public class JsonParser {
 
   /**
    * If the event returned by {@link #nextEvent()} was
+   * {@link JsonEvent#VALUE_INT} this method will return the parsed long integer
+   * @return the parsed long integer
+   */
+  public long getCurrentLong() {
+    return Long.parseLong(currentValue.toString());
+  }
+
+  /**
+   * If the event returned by {@link #nextEvent()} was
    * {@link JsonEvent#VALUE_DOUBLE} this method will return the parsed double
    * @return the parsed double
    */

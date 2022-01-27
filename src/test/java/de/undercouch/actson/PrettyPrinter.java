@@ -143,6 +143,11 @@ public class PrettyPrinter {
     result.append(value);
   }
 
+  private void onValue(long value) {
+    onValue();
+    result.append(value);
+  }
+
   private void onValue(double value) {
     onValue();
     result.append(value);
@@ -184,7 +189,11 @@ public class PrettyPrinter {
       onValue(parser.getCurrentString());
       break;
     case JsonEvent.VALUE_INT:
-      onValue(parser.getCurrentInt());
+      try {
+        onValue(parser.getCurrentInt());
+      } catch (NumberFormatException e) {
+        onValue(parser.getCurrentLong());
+      }
       break;
     case JsonEvent.VALUE_DOUBLE:
       onValue(parser.getCurrentDouble());
