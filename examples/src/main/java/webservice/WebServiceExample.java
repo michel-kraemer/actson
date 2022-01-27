@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2016 Michel Kraemer
+// Copyright (c) 2016-2022 Michel Kraemer
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -23,11 +23,8 @@
 
 package webservice;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import de.undercouch.actson.JsonEvent;
-import io.vertx.core.Future;
-import io.vertx.core.buffer.Buffer;
+import io.vertx.core.Promise;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.rxjava.core.AbstractVerticle;
 import io.vertx.rxjava.core.Vertx;
@@ -37,6 +34,8 @@ import io.vertx.rxjava.core.http.HttpServerResponse;
 import rx.Observable;
 import rxjava.JsonParserOperator;
 import rxjava.Result;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * <p>This example combines Vert.x, RxJava and Actson to a reactive web service.
@@ -54,23 +53,21 @@ public class WebServiceExample extends AbstractVerticle {
    */
   public static void main(String[] args) {
     Vertx vertx = Vertx.vertx();
-    vertx.deployVerticleObservable(WebServiceExample.class.getName())
-      .subscribe(v -> {
-        System.out.println("Web service successfully deployed");
-      }, err -> {
+    vertx.rxDeployVerticle(WebServiceExample.class.getName())
+      .subscribe(v -> System.out.println("Web service successfully deployed"), err -> {
         err.printStackTrace();
         System.exit(1);
       });
   }
 
   @Override
-  public void start(Future<Void> startFuture) {
+  public void start(Promise<Void> startFuture) {
     // deploy the web server
     HttpServerOptions options = new HttpServerOptions()
         .setCompressionSupported(true);
     HttpServer server = vertx.createHttpServer(options);
     server.requestHandler(this::onRequest);
-    server.listenObservable(8080) // listen on port 8080
+    server.rxListen(8080) // listen on port 8080
       .subscribe(v -> startFuture.complete(), startFuture::fail);
   }
 
@@ -83,7 +80,7 @@ public class WebServiceExample extends AbstractVerticle {
     AtomicInteger level = new AtomicInteger(0);
 
     request.toObservable()
-      .map(buf -> ((Buffer)buf.getDelegate()).getBytes())
+      .map(buf -> buf.getDelegate().getBytes())
       .lift(new JsonParserOperator()) // convert JSON file to JSON events
       .map(Result::getEvent)
       .flatMap(event -> {

@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2016 Michel Kraemer
+// Copyright (c) 2016-2022 Michel Kraemer
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -37,7 +37,7 @@ public class JsonParserOperator implements Operator<Result, byte[]> {
   /**
    * Non-blocking JSON parser
    */
-  private JsonParser parser = new JsonParser();
+  private final JsonParser parser = new JsonParser();
 
   /**
    * Process events from the parser until it needs more input. Notify the

@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2016 Michel Kraemer
+// Copyright (c) 2016-2022 Michel Kraemer
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -41,7 +41,7 @@ import io.vertx.core.file.OpenOptions;
  * @author Michel Kraemer
  */
 public class VertxExample {
-  private Vertx vertx = Vertx.vertx();
+  private final Vertx vertx = Vertx.vertx();
 
   /**
    * The main program. Accepts one argument: the name of the file to parse
@@ -112,9 +112,7 @@ public class VertxExample {
         return true;
       };
 
-      f.exceptionHandler(t -> {
-        handler.handle(Future.failedFuture(t));
-      });
+      f.exceptionHandler(t -> handler.handle(Future.failedFuture(t)));
 
       f.handler(buf -> {
         // forward bytes read from the file to the parser
