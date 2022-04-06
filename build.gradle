@@ -24,7 +24,7 @@ tasks.withType(JavaCompile) {
 }
 
 dependencies {
-    testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.13.2'
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.13.2.2'
     testImplementation 'commons-io:commons-io:2.11.0'
     testImplementation("org.assertj:assertj-core:3.22.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
