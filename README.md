@@ -94,7 +94,7 @@ Example for Maven:
     <dependency>
         <groupId>de.undercouch</groupId>
         <artifactId>actson</artifactId>
-        <version>2.0.0</version>
+        <version>2.1.0</version>
     </dependency>
 </dependencies>
 ```
@@ -103,7 +103,7 @@ Example for Gradle:
 
 ```gradle
 dependencies {
-    compile 'de.undercouch:actson:2.0.0'
+    implementation 'de.undercouch:actson:2.1.0'
 }
 ```
 
