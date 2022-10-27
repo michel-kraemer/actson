@@ -301,6 +301,8 @@ public class JsonParser {
   /**
    * Constructs the JSON parser
    * @param feeder the feeder that will provide the parser with input data
+   * @param bufferProvider the buffer provider that creates instances of
+   * {@link Buffer} to keep currently parsed values in memory
    */
   public JsonParser(JsonFeeder feeder, BufferProvider bufferProvider) {
     stack = new byte[16];
