@@ -16,7 +16,7 @@ ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 ext.junitVersion = "5.9.0"
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
 tasks.withType(JavaCompile) {
@@ -50,8 +50,8 @@ test {
 
 jacocoTestReport {
     reports {
-        xml.enabled = true
-        html.enabled = true
+        xml.required = true
+        html.required = true
     }
 }
 
