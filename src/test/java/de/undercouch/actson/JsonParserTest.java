@@ -25,6 +25,9 @@ package de.undercouch.actson;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.undercouch.actson.buffer.Buffer;
+import de.undercouch.actson.buffer.BufferProvider;
+import de.undercouch.actson.buffer.DefaultBufferProvider;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 
@@ -33,6 +36,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -408,5 +412,70 @@ public class JsonParserTest {
     String json = "0";
     JsonParser parser = new JsonParser();
     assertThat(parse(json, parser)).isEqualTo(json);
+  }
+
+  /**
+   * Test if a custom buffer provider can be provided
+   */
+  @Test
+  public void customBufferProvider() {
+    AtomicInteger called = new AtomicInteger();
+    class MyBufferProvider extends DefaultBufferProvider {
+      @Override
+      public Buffer newBuffer() {
+        called.incrementAndGet();
+        return super.newBuffer();
+      }
+    }
+    JsonParser parser = new JsonParser(new DefaultJsonFeeder(StandardCharsets.UTF_8),
+      new MyBufferProvider());
+    String json = "{\"name\":\"Elvis\"}";
+    assertJsonObjectEquals(json, parse(json, parser));
+    assertThat(called).hasValue(3);
+  }
+
+  /**
+   * Test if a custom buffer provider can be provided that limits the number
+   * of characters that can be stored in a buffer
+   */
+  @Test
+  public void limitingBufferProvider() {
+    class LimitingBuffer implements Buffer {
+      private final StringBuilder value = new StringBuilder(128);
+      private boolean overflow = false;
+
+      @Override
+      public Buffer append(char c) {
+        if (overflow) {
+          return this;
+        }
+        if (value.length() == 5) {
+          value.setLength(0);
+          value.append("Overflow");
+          overflow = true;
+          return this;
+        }
+        value.append(c);
+        return this;
+      }
+
+      @Override
+      public String toString() {
+        return value.toString();
+      }
+    }
+
+    class LimitingBufferProvider implements BufferProvider {
+      @Override
+      public Buffer newBuffer() {
+        return new LimitingBuffer();
+      }
+    }
+
+    JsonParser parser = new JsonParser(new DefaultJsonFeeder(StandardCharsets.UTF_8),
+      new LimitingBufferProvider());
+    String expected = "{\"name\":\"Overflow\"}";
+    String json = "{\"name\":\"A very long name\"}";
+    assertJsonObjectEquals(expected, parse(json, parser));
   }
 }

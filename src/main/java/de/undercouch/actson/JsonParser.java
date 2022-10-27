@@ -24,6 +24,10 @@
 
 package de.undercouch.actson;
 
+import de.undercouch.actson.buffer.Buffer;
+import de.undercouch.actson.buffer.BufferProvider;
+import de.undercouch.actson.buffer.DefaultBufferProvider;
+
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -209,10 +213,15 @@ public class JsonParser {
   private byte state;
 
   /**
+   * Provides instances of a {@link Buffer} for {@link #currentBuffer}
+   */
+  private final BufferProvider bufferProvider;
+
+  /**
    * Collects all characters if the current state is ST (String),
    * IN (Integer), FR (Fraction) or the like
    */
-  private final StringBuilder currentValue = new StringBuilder(128);
+  private Buffer currentBuffer;
 
   /**
    * The number of characters processed by the JSON parser
@@ -286,10 +295,20 @@ public class JsonParser {
    * @param feeder the feeder that will provide the parser with input data
    */
   public JsonParser(JsonFeeder feeder) {
+    this(feeder, new DefaultBufferProvider());
+  }
+
+  /**
+   * Constructs the JSON parser
+   * @param feeder the feeder that will provide the parser with input data
+   */
+  public JsonParser(JsonFeeder feeder, BufferProvider bufferProvider) {
     stack = new byte[16];
     state = GO;
     push(MODE_DONE);
     this.feeder = feeder;
+    this.bufferProvider = bufferProvider;
+    this.currentBuffer = bufferProvider.newBuffer();
   }
 
   /**
@@ -386,11 +405,11 @@ public class JsonParser {
         // being less than or equal to E3.
         // if (state >= ST && state <= E3) {
         if (state >= ST) {
-          currentValue.append(nextChar);
+          currentBuffer.append(nextChar);
         } else {
-          currentValue.setLength(0);
+          currentBuffer = bufferProvider.newBuffer();
           if (nextState != ST) {
-            currentValue.append(nextChar);
+            currentBuffer.append(nextChar);
           }
         }
       } else if (nextState == OK) {
@@ -548,7 +567,7 @@ public class JsonParser {
    * @return the parsed string
    */
   public String getCurrentString() {
-    return currentValue.toString();
+    return currentBuffer.toString();
   }
 
   /**
@@ -557,7 +576,7 @@ public class JsonParser {
    * @return the parsed integer
    */
   public int getCurrentInt() {
-    return Integer.parseInt(currentValue.toString());
+    return Integer.parseInt(currentBuffer.toString());
   }
 
   /**
@@ -566,7 +585,7 @@ public class JsonParser {
    * @return the parsed long integer
    */
   public long getCurrentLong() {
-    return Long.parseLong(currentValue.toString());
+    return Long.parseLong(currentBuffer.toString());
   }
 
   /**
@@ -575,7 +594,7 @@ public class JsonParser {
    * @return the parsed double
    */
   public double getCurrentDouble() {
-    return Double.parseDouble(currentValue.toString());
+    return Double.parseDouble(currentBuffer.toString());
   }
 
   /**
