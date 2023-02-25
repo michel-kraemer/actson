@@ -1,5 +1,5 @@
 plugins {
-    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
+    id("io.github.gradle-nexus.publish-plugin") version "1.2.0"
 }
 
 apply plugin: 'jacoco'
@@ -13,7 +13,7 @@ sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
-ext.junitVersion = "5.9.1"
+ext.junitVersion = "5.9.2"
 
 repositories {
     mavenCentral()
@@ -24,9 +24,9 @@ tasks.withType(JavaCompile) {
 }
 
 dependencies {
-    testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4.2'
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
     testImplementation 'commons-io:commons-io:2.11.0'
-    testImplementation("org.assertj:assertj-core:3.23.1")
+    testImplementation("org.assertj:assertj-core:3.24.2")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junitVersion")
@@ -35,13 +35,13 @@ dependencies {
 // package javadoc into a jar file
 task packageJavadoc(type: Jar, dependsOn: 'javadoc') {
     from javadoc.destinationDir
-    classifier = 'javadoc'
+    archiveClassifier = 'javadoc'
 }
 
 // package source into a jar file
 task packageSources(type: Jar) {
     from sourceSets.main.allSource
-    classifier = 'sources'
+    archiveClassifier = 'sources'
 }
 
 test {
