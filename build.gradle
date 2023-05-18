@@ -1,5 +1,7 @@
 plugins {
     id("io.github.gradle-nexus.publish-plugin") version "1.2.0"
+    id("se.patrikerdes.use-latest-versions") version "0.2.18"
+    id("com.github.ben-manes.versions") version "0.46.0"
 }
 
 apply plugin: 'jacoco'
@@ -60,6 +62,18 @@ check.dependsOn jacocoTestReport
 java {
     withJavadocJar()
     withSourcesJar()
+}
+
+def isNonStable = { String version ->
+  def stableKeyword = ['RELEASE', 'FINAL', 'GA'].any { it -> version.toUpperCase().contains(it) }
+  def regex = /^[0-9,.v-]+(-r)?$/
+  return !stableKeyword && !(version ==~ regex)
+}
+
+tasks.named("dependencyUpdates").configure {
+  rejectVersionIf {
+    isNonStable(it.candidate.version) && !isNonStable(it.currentVersion)
+  }
 }
 
 publishing {
