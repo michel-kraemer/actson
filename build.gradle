@@ -15,7 +15,7 @@ sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
-ext.junitVersion = "5.10.1"
+ext.junitVersion = "5.10.2"
 
 repositories {
     mavenCentral()
