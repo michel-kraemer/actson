@@ -9,7 +9,7 @@ apply plugin: 'java'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
-version = '2.1.0'
+version = '2.1.1'
 group = 'de.undercouch'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
